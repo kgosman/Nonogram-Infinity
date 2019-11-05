@@ -1,0 +1,25 @@
+﻿<Window x:Class="Nonogram_Infinity.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Nonogram_Infinity"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="950" Width="1400" Left="0" Top="0">
+    <Grid>
+        <Canvas>
+            <Rectangle Width="775" Height="775" Stroke="Black" 
+                Canvas.Top="100" Canvas.Left="100" StrokeThickness="3"/>
+        </Canvas>
+        <Canvas HorizontalAlignment="Left" Height="775" Margin="100,100,0,0"
+                VerticalAlignment="Top" Width="775"
+                Name="myCanvas"/>
+        <Canvas HorizontalAlignment="Left" Height="100" Margin="100,0,0,0"
+                VerticalAlignment="Top" Width="775"
+                Name="colCanvas"/>
+        <Canvas HorizontalAlignment="Left" Height="775" Margin="0,100,0,0"
+                VerticalAlignment="Top" Width="100"
+                Name="rowCanvas"/>
+    </Grid>
+
+</Window>
