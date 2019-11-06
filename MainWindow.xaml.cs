@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,28 +24,30 @@ namespace Nonogram_Infinity
         public MainWindow()
         {
             InitializeComponent();
-            int numColumns = 20;
-            int numRows = 20;
-
-            List<int>[] colConstraints = MakeColConstraints(numColumns);
-            List<int>[] rowConstraints = MakeRowConstraints(numRows);
-
-            bool[,] matrix = new bool[numColumns, numRows];
+            ReadFile grid = new ReadFile
+            {
+                filepath = "C:\\Users\\kaden\\OneDrive - University of Louisville\\Fall 2019\\AI\\Proj6\\Nonogram_Infinity\\Data\\Circle.txt"
+            };
+            grid.MakeConstraints();
+            bool[,] matrix = new bool[grid.numColumns, grid.numRows];
             matrix[1, 2] = true;
-            DrawGrid(numColumns, numRows, matrix, colConstraints,rowConstraints);        
+            matrix[5, 1] = true;
+            DrawBoard(grid, matrix);
+            DrawWoC(grid,grid.solution);
+            
         }
 
-        public void DrawGrid(int width, int height, bool[,] matrix, List<int>[] colConstraints, List<int>[] rowConstraints)
+        public void DrawBoard(ReadFile grid, bool[,] matrix)
         {
             myCanvas.Children.Clear();
-            double xSpace = myCanvas.Width / width;
-            double ySpace = myCanvas.Height / height;
+            double xSpace = myCanvas.Width / grid.numColumns;
+            double ySpace = myCanvas.Height / grid.numRows;
 
-            LabelColumns(xSpace, colConstraints);
-            LabelRows(ySpace, rowConstraints);
-            for(int j = 0; j < height; j++)
+            LabelColumns(xSpace, grid.colConstraints);
+            LabelRows(ySpace, grid.rowConstraints);
+            for(int j = 0; j < grid.numRows; j++)
             {
-                for (int i = 0; i < width; i++)
+                for (int i = 0; i < grid.numColumns; i++)
                 {
                     Rectangle rectangle = new Rectangle
                     {
@@ -55,10 +58,46 @@ namespace Nonogram_Infinity
                     if(matrix[i,j] == true)
                     {
                         rectangle.Fill = Brushes.Black;
+                        if(grid.solution[i,j] == true)
+                        {
+                            rectangle.Fill = Brushes.Lime;
+                        }
                     } 
                     Canvas.SetLeft(rectangle, xSpace * j);
                     Canvas.SetTop(rectangle, ySpace * i);
                     myCanvas.Children.Add(rectangle);
+                }
+            }
+        }
+        public void DrawWoC(ReadFile grid, bool[,] matrix)
+        {
+            wocCanvas.Children.Clear();
+            double xSpace = wocCanvas.Width / grid.numColumns;
+            double ySpace = wocCanvas.Height / grid.numRows;
+
+            //LabelColumns(xSpace, grid.colConstraints);
+            //LabelRows(ySpace, grid.rowConstraints);
+            for (int j = 0; j < grid.numRows; j++)
+            {
+                for (int i = 0; i < grid.numColumns; i++)
+                {
+                    Rectangle rectangle = new Rectangle
+                    {
+                        Stroke = Brushes.Black,
+                        Width = xSpace,
+                        Height = ySpace
+                    };
+                    if (matrix[i, j] == true)
+                    {
+                        rectangle.Fill = Brushes.Black;
+                        if (grid.solution[i, j] == true)
+                        {
+                            rectangle.Fill = Brushes.Lime;
+                        }
+                    }
+                    Canvas.SetLeft(rectangle, xSpace * j);
+                    Canvas.SetTop(rectangle, ySpace * i);
+                    wocCanvas.Children.Add(rectangle);
                 }
             }
         }
@@ -76,20 +115,38 @@ namespace Nonogram_Infinity
                     Canvas.SetLeft(textBox, xSpace * i + xSpace / 2 - 1);
                     Canvas.SetTop(textBox, 75);
                     colCanvas.Children.Add(textBox);
+
+                    TextBlock textBoxWoC = new TextBlock
+                    {
+                        FontSize = 17.5,
+                        Text = colConstraints[i][0].ToString()
+                    };
+                    Canvas.SetLeft(textBoxWoC, xSpace * i + xSpace / 2 - 1);
+                    Canvas.SetTop(textBoxWoC, 75);
+                    wocColCanvas.Children.Add(textBoxWoC);
                 }
                 else
                 {
                     int yOffset = 75;
-                    for(int j = 0; j < colConstraints[i].Count; j++)
+                    foreach(int j in colConstraints[i])
                     {
                         TextBlock textBox = new TextBlock
                         {
                             FontSize = 17.5,
-                            Text = colConstraints[i][j].ToString()
+                            Text = j.ToString()
                         };
                         Canvas.SetLeft(textBox, xSpace * i + xSpace/2 - 1);
                         Canvas.SetTop(textBox, yOffset);
                         colCanvas.Children.Add(textBox);
+
+                        TextBlock textBoxWoC = new TextBlock
+                        {
+                            FontSize = 17.5,
+                            Text = j.ToString()
+                        };
+                        Canvas.SetLeft(textBoxWoC, xSpace * i + xSpace / 2 - 1);
+                        Canvas.SetTop(textBoxWoC, yOffset);
+                        wocColCanvas.Children.Add(textBoxWoC);
                         yOffset -= 15;                        
                     }
                 }
@@ -107,157 +164,44 @@ namespace Nonogram_Infinity
                         Text = rowConstraints[i][0].ToString()
                     };
                     Canvas.SetTop(textBox, ySpace * i + ySpace / 4);
-                    Canvas.SetLeft(textBox, 75);
+                    Canvas.SetLeft(textBox, 50);
                     rowCanvas.Children.Add(textBox);
+
+                    TextBlock textBoxWoC = new TextBlock
+                    {
+                        FontSize = 17.5,
+                        Text = rowConstraints[i][0].ToString()
+                    };
+                    Canvas.SetTop(textBoxWoC, ySpace * i + ySpace / 4);
+                    Canvas.SetLeft(textBoxWoC, 50);
+                    wocRowCanvas.Children.Add(textBoxWoC);
                 }
                 else
                 {
-                    int xOffset = 75;
-                    for (int j = 0; j < rowConstraints[i].Count; j++)
+                    int xOffset = 50;
+                    foreach(int j in rowConstraints[i])
                     {
                         TextBlock textBox = new TextBlock
                         {
                             FontSize = 17.5,
-                            Text = rowConstraints[i][j].ToString()
+                            Text = j.ToString()
                         };
                         Canvas.SetTop(textBox, ySpace * i + ySpace / 4 );
                         Canvas.SetLeft(textBox, xOffset);
                         rowCanvas.Children.Add(textBox);
+
+                        TextBlock textBoxWoC = new TextBlock
+                        {
+                            FontSize = 17.5,
+                            Text = j.ToString()
+                        };
+                        Canvas.SetTop(textBoxWoC, ySpace * i + ySpace / 4);
+                        Canvas.SetLeft(textBoxWoC, xOffset);
+                        wocRowCanvas.Children.Add(textBoxWoC);
                         xOffset -= 15;
                     }
                 }
             }
         }
-
-        public List<int>[] MakeColConstraints(int numColumns)
-        {
-            List<int>[] colConstraints = new List<int>[numColumns];
-
-            for(int i = 0; i < numColumns; i++)
-            {
-                colConstraints[i] = new List<int>();
-            }
-            colConstraints[0].Add(0);
-
-            colConstraints[1].Add(2);
-
-            colConstraints[2].Add(3);
-
-            colConstraints[3].Add(2);
-            colConstraints[3].Add(2);
-
-            colConstraints[4].Add(1);
-            colConstraints[4].Add(5);
-
-            colConstraints[5].Add(2);
-            colConstraints[5].Add(5);
-
-            colConstraints[6].Add(1);
-            colConstraints[6].Add(4);
-
-            colConstraints[7].Add(1);
-            colConstraints[7].Add(1);
-            colConstraints[7].Add(5);
-
-            colConstraints[8].Add(1);
-            colConstraints[8].Add(2);
-            colConstraints[8].Add(4);
-
-            colConstraints[9].Add(1);
-            colConstraints[9].Add(8);
-
-            colConstraints[10].Add(2);
-            colConstraints[10].Add(1);
-            colConstraints[10].Add(5);
-            colConstraints[10].Add(2);
-
-            colConstraints[11].Add(2);
-            colConstraints[11].Add(4);
-
-            colConstraints[12].Add(3);
-            colConstraints[12].Add(5);
-
-            colConstraints[13].Add(2);
-            colConstraints[13].Add(4);
-            colConstraints[13].Add(1);
-
-            colConstraints[14].Add(2);
-            colConstraints[14].Add(4);
-            colConstraints[14].Add(2);
-
-            colConstraints[15].Add(7);
-
-            colConstraints[16].Add(5);
-
-            colConstraints[17].Add(2);
-
-            colConstraints[18].Add(0);
-
-            colConstraints[19].Add(0);
-            return colConstraints;
-        }
-        public List<int>[] MakeRowConstraints(int numRows)
-        {
-
-            List<int>[] rowConstraints = new List<int>[numRows];
-            for (int i = 0; i < numRows; i++)
-            {
-                rowConstraints[i] = new List<int>();
-            }
-            rowConstraints[0].Add(0);
-
-            rowConstraints[1].Add(0);
-
-            rowConstraints[2].Add(0);
-
-            rowConstraints[3].Add(0);
-
-            rowConstraints[4].Add(1);
-            rowConstraints[4].Add(3);
-
-            rowConstraints[5].Add(2);
-            rowConstraints[5].Add(2);
-            rowConstraints[5].Add(6);
-
-            rowConstraints[6].Add(1);
-            rowConstraints[6].Add(1);
-            rowConstraints[6].Add(1);
-            rowConstraints[6].Add(4);
-            rowConstraints[6].Add(2);
-
-            rowConstraints[7].Add(11);
-
-            rowConstraints[8].Add(11);
-
-            rowConstraints[9].Add(9);
-
-            rowConstraints[10].Add(12);
-
-            rowConstraints[11].Add(5);
-            rowConstraints[11].Add(2);
-            rowConstraints[11].Add(2);
-
-            rowConstraints[12].Add(4);
-            rowConstraints[12].Add(2);
-
-            rowConstraints[13].Add(2);
-            rowConstraints[13].Add(1);
-            rowConstraints[13].Add(2);
-
-            rowConstraints[14].Add(3);
-
-            rowConstraints[15].Add(4);
-
-            rowConstraints[16].Add(4);
-
-            rowConstraints[17].Add(6);
-
-            rowConstraints[18].Add(0);
-
-            rowConstraints[19].Add(0);
-
-            return rowConstraints;
-        }
     }
 }
-
