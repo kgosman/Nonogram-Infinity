@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MathNet.Numerics;
 
 namespace _5TSPGA
 {
@@ -228,7 +227,7 @@ namespace _5TSPGA
                 {
                     if (matrix[i, j] != 0)
                     {
-                        matrix[i, j] = (SpecialFunctions.BetaRegularized(3, 3, (matrix[i, j] / 50)));
+                       // matrix[i, j] = (SpecialFunctions.BetaRegularized(3, 3, (matrix[i, j] / 50)));
                     }
                     if (matrix[i, j] > previousMax)
                     {
