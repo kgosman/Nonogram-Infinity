@@ -23,7 +23,7 @@ public class DNA<T>
 	{
         if (Genes != null)
         {
-            Genes.Shuffle();
+            //Genes.Shuffle();
             this.Genes = new List<IChromosome<T>>(Genes);
         }
         else

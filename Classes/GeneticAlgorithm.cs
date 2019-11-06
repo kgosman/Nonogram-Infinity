@@ -291,7 +291,7 @@ namespace Project_4.Scripts
             if (SelectionType == SelectionType.ROULETTE)
             {
                 matingPool = ChooseMatingPool();
-                matingPool.Shuffle();
+                //matingPool.Shuffle();
             }
             else
             {

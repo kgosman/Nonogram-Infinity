@@ -20,6 +20,9 @@
         <Canvas HorizontalAlignment="Left" Height="775" Margin="0,100,0,0"
                 VerticalAlignment="Top" Width="100"
                 Name="rowCanvas"/>
+        <Canvas HorizontalAlignment="Left" Height="775" Margin="100,100,0,0"
+                VerticalAlignment="Top" Width="775"
+                Name="solutionCanvas"/>
     </Grid>
 
 </Window>
