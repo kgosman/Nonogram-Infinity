@@ -8,21 +8,31 @@
         Title="MainWindow" Height="950" Width="1400" Left="0" Top="0">
     <Grid>
         <Canvas>
-            <Rectangle Width="775" Height="775" Stroke="Black" 
-                Canvas.Top="100" Canvas.Left="100" StrokeThickness="3"/>
+            <Rectangle Width="600" Height="600" Stroke="Black" 
+                Canvas.Top="100" Canvas.Left="75" StrokeThickness="3"/>
         </Canvas>
-        <Canvas HorizontalAlignment="Left" Height="775" Margin="100,100,0,0"
-                VerticalAlignment="Top" Width="775"
+        <Canvas HorizontalAlignment="Left" Height="600" Margin="75,100,0,0"
+                VerticalAlignment="Top" Width="600"
                 Name="myCanvas"/>
-        <Canvas HorizontalAlignment="Left" Height="100" Margin="100,0,0,0"
-                VerticalAlignment="Top" Width="775"
+        <Canvas HorizontalAlignment="Left" Height="100" Margin="75,0,0,0"
+                VerticalAlignment="Top" Width="600"
                 Name="colCanvas"/>
-        <Canvas HorizontalAlignment="Left" Height="775" Margin="0,100,0,0"
-                VerticalAlignment="Top" Width="100"
+        <Canvas HorizontalAlignment="Left" Height="600" Margin="0,100,0,0"
+                VerticalAlignment="Top" Width="75"
                 Name="rowCanvas"/>
-        <Canvas HorizontalAlignment="Left" Height="775" Margin="100,100,0,0"
-                VerticalAlignment="Top" Width="775"
-                Name="solutionCanvas"/>
+        <Canvas>
+            <Rectangle Width="600" Height="600" Stroke="Black" 
+                Canvas.Top="100" Canvas.Left="750" StrokeThickness="3"/>
+        </Canvas>
+        <Canvas HorizontalAlignment="Left" Height="600" Margin="750,100,0,0"
+                VerticalAlignment="Top" Width="600"
+                Name="wocCanvas"/>
+        <Canvas HorizontalAlignment="Left" Height="100" Margin="750,0,0,0"
+                VerticalAlignment="Top" Width="600"
+                Name="wocColCanvas"/>
+        <Canvas HorizontalAlignment="Left" Height="600" Margin="675,100,0,0"
+                VerticalAlignment="Top" Width="75"
+                Name="wocRowCanvas"/>
     </Grid>
 
 </Window>

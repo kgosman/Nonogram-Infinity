@@ -24,15 +24,20 @@ namespace Nonogram_Infinity
         public MainWindow()
         {
             InitializeComponent();
+            DirectoryInfo di = new DirectoryInfo(Directory.GetCurrentDirectory());
+            di = (di.Parent).Parent;
+
             ReadFile grid = new ReadFile
             {
-                filepath = "C:\\Users\\kaden\\OneDrive - University of Louisville\\Fall 2019\\AI\\Proj6\\Nonogram_Infinity\\Data\\Lizard.txt"
+                filepath = di.FullName + "\\Data\\Lizard.txt"
             };
             grid.MakeConstraints();
             bool[,] matrix = new bool[grid.numColumns, grid.numRows];
             matrix[1, 2] = true;
             matrix[5, 1] = true;
-            DrawBoard(grid, matrix);        
+            DrawBoard(grid, matrix);
+            DrawWoC(grid,grid.solution);
+            
         }
 
         public void DrawBoard(ReadFile grid, bool[,] matrix)
@@ -58,12 +63,44 @@ namespace Nonogram_Infinity
                         rectangle.Fill = Brushes.Black;
                         if(grid.solution[i,j] == true)
                         {
-                            rectangle.Fill = Brushes.Green;
+                            rectangle.Fill = Brushes.Lime;
                         }
                     } 
                     Canvas.SetLeft(rectangle, xSpace * j);
                     Canvas.SetTop(rectangle, ySpace * i);
                     myCanvas.Children.Add(rectangle);
+                }
+            }
+        }
+        public void DrawWoC(ReadFile grid, bool[,] matrix)
+        {
+            wocCanvas.Children.Clear();
+            double xSpace = wocCanvas.Width / grid.numColumns;
+            double ySpace = wocCanvas.Height / grid.numRows;
+
+            //LabelColumns(xSpace, grid.colConstraints);
+            //LabelRows(ySpace, grid.rowConstraints);
+            for (int j = 0; j < grid.numRows; j++)
+            {
+                for (int i = 0; i < grid.numColumns; i++)
+                {
+                    Rectangle rectangle = new Rectangle
+                    {
+                        Stroke = Brushes.Black,
+                        Width = xSpace,
+                        Height = ySpace
+                    };
+                    if (matrix[i, j] == true)
+                    {
+                        rectangle.Fill = Brushes.Black;
+                        if (grid.solution[i, j] == true)
+                        {
+                            rectangle.Fill = Brushes.Lime;
+                        }
+                    }
+                    Canvas.SetLeft(rectangle, xSpace * j);
+                    Canvas.SetTop(rectangle, ySpace * i);
+                    wocCanvas.Children.Add(rectangle);
                 }
             }
         }
@@ -81,6 +118,15 @@ namespace Nonogram_Infinity
                     Canvas.SetLeft(textBox, xSpace * i + xSpace / 2 - 1);
                     Canvas.SetTop(textBox, 75);
                     colCanvas.Children.Add(textBox);
+
+                    TextBlock textBoxWoC = new TextBlock
+                    {
+                        FontSize = 17.5,
+                        Text = colConstraints[i][0].ToString()
+                    };
+                    Canvas.SetLeft(textBoxWoC, xSpace * i + xSpace / 2 - 1);
+                    Canvas.SetTop(textBoxWoC, 75);
+                    wocColCanvas.Children.Add(textBoxWoC);
                 }
                 else
                 {
@@ -95,6 +141,15 @@ namespace Nonogram_Infinity
                         Canvas.SetLeft(textBox, xSpace * i + xSpace/2 - 1);
                         Canvas.SetTop(textBox, yOffset);
                         colCanvas.Children.Add(textBox);
+
+                        TextBlock textBoxWoC = new TextBlock
+                        {
+                            FontSize = 17.5,
+                            Text = j.ToString()
+                        };
+                        Canvas.SetLeft(textBoxWoC, xSpace * i + xSpace / 2 - 1);
+                        Canvas.SetTop(textBoxWoC, yOffset);
+                        wocColCanvas.Children.Add(textBoxWoC);
                         yOffset -= 15;                        
                     }
                 }
@@ -112,12 +167,21 @@ namespace Nonogram_Infinity
                         Text = rowConstraints[i][0].ToString()
                     };
                     Canvas.SetTop(textBox, ySpace * i + ySpace / 4);
-                    Canvas.SetLeft(textBox, 75);
+                    Canvas.SetLeft(textBox, 50);
                     rowCanvas.Children.Add(textBox);
+
+                    TextBlock textBoxWoC = new TextBlock
+                    {
+                        FontSize = 17.5,
+                        Text = rowConstraints[i][0].ToString()
+                    };
+                    Canvas.SetTop(textBoxWoC, ySpace * i + ySpace / 4);
+                    Canvas.SetLeft(textBoxWoC, 50);
+                    wocRowCanvas.Children.Add(textBoxWoC);
                 }
                 else
                 {
-                    int xOffset = 75;
+                    int xOffset = 50;
                     foreach(int j in rowConstraints[i])
                     {
                         TextBlock textBox = new TextBlock
@@ -128,6 +192,15 @@ namespace Nonogram_Infinity
                         Canvas.SetTop(textBox, ySpace * i + ySpace / 4 );
                         Canvas.SetLeft(textBox, xOffset);
                         rowCanvas.Children.Add(textBox);
+
+                        TextBlock textBoxWoC = new TextBlock
+                        {
+                            FontSize = 17.5,
+                            Text = j.ToString()
+                        };
+                        Canvas.SetTop(textBoxWoC, ySpace * i + ySpace / 4);
+                        Canvas.SetLeft(textBoxWoC, xOffset);
+                        wocRowCanvas.Children.Add(textBoxWoC);
                         xOffset -= 15;
                     }
                 }
@@ -135,4 +208,3 @@ namespace Nonogram_Infinity
         }
     }
 }
-
