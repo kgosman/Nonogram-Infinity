@@ -102,6 +102,8 @@ namespace Nonogram_Infinity
         public void ConsultExperts() //Kaden todo
         {
 
+
+
         }
     }
 }

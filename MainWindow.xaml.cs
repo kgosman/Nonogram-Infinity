@@ -24,9 +24,12 @@ namespace Nonogram_Infinity
         public MainWindow()
         {
             InitializeComponent();
+            DirectoryInfo di = new DirectoryInfo(Directory.GetCurrentDirectory());
+            di = (di.Parent).Parent;
+
             ReadFile grid = new ReadFile
             {
-                filepath = "C:\\Users\\2386s\\OneDrive\\Documents\\GitHub\\Nonogram-Infinity\\Data\\Circle.txt"
+                filepath = di.FullName + "\\Data\\Lizard.txt"
             };
             grid.MakeConstraints();
             bool[,] matrix = new bool[grid.numColumns, grid.numRows];
