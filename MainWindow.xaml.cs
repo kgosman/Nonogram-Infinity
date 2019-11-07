@@ -23,13 +23,15 @@ namespace Nonogram_Infinity
         public MainWindow()
         {
             InitializeComponent();
-            int numColumns = 20;
-            int numRows = 20;
+            DirectoryInfo di = new DirectoryInfo(Directory.GetCurrentDirectory());
+            di = (di.Parent).Parent;
 
-            List<int>[] colConstraints = MakeColConstraints(numColumns);
-            List<int>[] rowConstraints = MakeRowConstraints(numRows);
-
-            bool[,] matrix = new bool[numColumns, numRows];
+            ReadFile grid = new ReadFile
+            {
+                filepath = di.FullName + "\\Data\\Lizard.txt"
+            };
+            grid.MakeConstraints();
+            bool[,] matrix = new bool[grid.numColumns, grid.numRows];
             matrix[1, 2] = true;
             DrawGrid(numColumns, numRows, matrix, colConstraints,rowConstraints);        
         }
