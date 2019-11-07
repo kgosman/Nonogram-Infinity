@@ -57,67 +57,10 @@ namespace Nonogram_Infinity
         //Calculate fitness of the dna
         public void FindFitness(List<int>[] RowRules, List<int>[] ColumnRules) //Will todo
         {
-            int fitness = 0;
-            for (int i = 0; i < row; i++)
-            {
-                int k = 0;
-                int current_runs = 0;
-                State currentState = State.INITIAL_STATE;
-                int rule = 0;
-                for (int j = 0; j < col; j++)
-                {
-                    if (k == RowRules[i].Count)
-                        break;
+            RowWiseFitness(RowRules);
+            ColumnWiseFitness(ColumnRules);
 
-                    rule = RowRules[i][k];
-
-                    currentState = StateMachine.Delta(dna[i, j], ref current_runs, rule);
-
-                    if (currentState == State.RULE_BROKEN)
-                        fitness += 1;
-
-                    if (currentState == State.INITIAL_STATE)
-                        k++;
-                }
-
-                if (currentState == State.RULE_BROKEN)
-                    fitness += 1;
-
-                if (currentState == State.COUNTING_RUNS && current_runs != rule)
-                    fitness += 1;
-
-            }
-
-            for (int j = 0; j < col; j++)
-            {
-                int k = 0;
-                int current_runs = 0;
-                State currentState = State.INITIAL_STATE;
-                int rule = 0;
-                for (int i = 0; i < row; i++)
-                {
-                    if (k == ColumnRules[j].Count)
-                        break;
-
-                    rule = ColumnRules[j][k];
-
-                    currentState = StateMachine.Delta(dna[i, j], ref current_runs, rule);
-
-                    if (currentState == State.RULE_BROKEN)
-                        fitness += 1;
-
-                    if (currentState == State.INITIAL_STATE)
-                        k++;
-                }
-
-                if (currentState == State.RULE_BROKEN)
-                    fitness += 1;
-
-                if (currentState == State.COUNTING_RUNS && current_runs != rule)
-                    fitness += 1;
-            }
-
-            this.fitness = fitness;
+            fitness = RowFitness + ColumnFitness;
         }
 
         public void RowWiseFitness(List<int>[] RowRules)
@@ -126,47 +69,74 @@ namespace Nonogram_Infinity
 
             Stack<bool> currentStack = new Stack<bool>();
 
-            for (int i = 0; i < RowRules.Count(); i++)
-            {
-                foreach (int rule in RowRules[i])
-                {
-                    for (int j = 0; j < rule; j++)
-                        currentStack.Push(true);
-                }
-            }
-
             for (int i = 0; i < row; i++)
             {
-                int k = 0;
-                int current_runs = 0;
                 State currentState = State.INITIAL_STATE;
-                int rule = 0;
+
+                for (int j = RowRules[i].Count - 1; j >= 0; j--)
+                {
+                    currentStack.Push(false);
+
+                    for (int k = 0; k < RowRules[i][j]; k++)
+                        currentStack.Push(true);
+                }
 
                 for (int j = 0; j < col; j++)
                 {
-                    if (k == RowRules[i].Count)
-                        break;
-
-                    rule = RowRules[i][k];
-
                     currentState = StateMachine.Delta(currentState, dna[i, j], ref currentStack);
 
                     if (currentState == State.RULE_BROKEN)
-                        fitness += 1;
-
-                    if (currentState == State.INITIAL_STATE)
-                        k++;
+                        fitness++;
                 }
 
-                if (currentState == State.RULE_BROKEN)
-                    fitness += 1;
+                while (currentStack.Count != 0)
+                {
+                    if (currentStack.Peek())
+                        fitness++;
 
-                if (currentState == State.COUNTING_RUNS && current_runs != rule)
-                    fitness += 1;
-
+                    currentStack.Pop();
+                }
             }
 
-            this.RowFitness = fitness;
+            RowFitness = fitness;
+        }
+
+        public void ColumnWiseFitness(List<int>[] ColumnRules)
+        {
+            int fitness = 0;
+
+            Stack<bool> currentStack = new Stack<bool>();
+
+            for (int j = 0; j < col; j++)
+            {
+                State currentState = State.INITIAL_STATE;
+
+                for (int i = ColumnRules[j].Count - 1; i >= 0; i--)
+                {
+                    currentStack.Push(false);
+
+                    for (int k = 0; k < ColumnRules[j][i]; k++)
+                        currentStack.Push(true);
+                }
+
+                for (int i = 0; i < row; i++)
+                {
+                    currentState = StateMachine.Delta(currentState, dna[i, j], ref currentStack);
+
+                    if (currentState == State.RULE_BROKEN)
+                        fitness++;
+                }
+
+                while (currentStack.Count != 0)
+                {
+                    if (currentStack.Peek())
+                        fitness++;
+
+                    currentStack.Pop();
+                }
+            }
+
+            ColumnFitness = fitness;
         }
 
         //Clone a members dna
@@ -216,7 +186,14 @@ namespace Nonogram_Infinity
                     && value == currentStack.Peek() && !currentStack.Peek())
                 currentState = State.INITIAL_STATE;
 
-            if ((currentState == State.COUNTING_RUNS || currentState == State.INITIAL_STATE)
+            if (currentState == State.COUNTING_RUNS && currentStack.Peek() != value)
+            {
+                currentState = State.RULE_BROKEN;
+
+                currentStack.Pop();
+            }
+
+            if (currentState == State.COUNTING_RUNS
                     && currentStack.Peek() == value && currentStack.Peek())
             {
                 currentState = State.COUNTING_RUNS;
@@ -224,8 +201,23 @@ namespace Nonogram_Infinity
                 currentStack.Pop();
             }
 
-            if (currentState == State.COUNTING_RUNS && currentStack.Peek() != value)
-                currentState = State.RULE_BROKEN;
+            if (currentState == State.INITIAL_STATE && value != currentStack.Peek() && !currentStack.Peek())
+            {
+                currentState = State.COUNTING_RUNS;
+                currentStack.Pop();
+
+                if (currentStack.Count() > 0)
+                    currentStack.Pop();
+                else
+                    currentState = State.RULE_BROKEN;
+            }
+
+            if (currentState == State.INITIAL_STATE && value == currentStack.Peek() && currentStack.Peek())
+            {
+                currentState = State.COUNTING_RUNS;
+
+                currentStack.Pop();
+            }
 
             return currentState;
         }
