@@ -37,7 +37,7 @@ namespace Nonogram_Infinity
             this.members = new List<Member>(100);
             for(int i = 0; i < 100; i++)
             {
-                members.Add(new Member(row, col, black_squares));
+                members.Add(new Member(row, col, black_squares, rowConstraints, colConstraints));
             }
         }
 
@@ -52,7 +52,7 @@ namespace Nonogram_Infinity
         //Breeding with 2 splice points chosen at random
         public Member Breed(Member mother, Member father)//Austin todo
         {
-            return new Member(row, col, black_squares);
+            return new Member(row, col, black_squares, rowConstraints, colConstraints);
         }
         //Breed top 50% discard bottom 25% and replace with 25% from the resultant breeding
         public void BreedPopulaton(bool elitePreservation)//***********done************
@@ -72,7 +72,7 @@ namespace Nonogram_Infinity
             }
             foreach(Member child in offspring)
             {
-                child.FindFitness();
+                child.FindFitness(rowConstraints, colConstraints);
                 members.Add(child);
             }
             MutatePopulation(elitePreservation);
