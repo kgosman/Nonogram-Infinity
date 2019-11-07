@@ -35,8 +35,10 @@ namespace Nonogram_Infinity
             bool[,] matrix = new bool[grid.numColumns, grid.numRows];
             matrix[1, 2] = true;
             matrix[5, 1] = true;
-            DrawBoard(grid, matrix);
-            DrawWoC(grid,grid.solution);
+            Member Test = new Member(grid.numColumns, grid.numRows, 21);
+            Member Test2 = new Member(grid.numColumns, grid.numRows, 21);
+            DrawBoard(grid, Test.dna);
+            DrawWoC(grid,Test2.dna);
             
         }
 
