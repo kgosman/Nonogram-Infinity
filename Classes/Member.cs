@@ -9,13 +9,13 @@ namespace Nonogram_Infinity
     public class Member
     {
         public int Fitness { get; private set; }
-        public bool[,] DNA { get; private set; }
+        public bool[,] DNA { get; set; }
         private readonly int Row;
         private readonly int Column;
 
         public List<int> RowFitness { get; private set; }
         public List<int> ColumnFitness { get; private set; }
-        public Member (int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA = null)
+        public Member (int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules)
         {
             Fitness = 0;
             this.Row = Row;
@@ -25,36 +25,30 @@ namespace Nonogram_Infinity
 
             ColumnFitness = new List<int>(Column);
 
-            if (DNA == null)
+            this.DNA = new bool[this.Row, this.Column];
+
+            int l, k, rng;
+            int[] array = new int[Row * Column];
+            for (int i = 0; i < Row; i++)
             {
-                this.DNA = new bool[this.Row, this.Column];
-
-
-                int l, k, rng;
-                int[] array = new int[Row * Column];
-                for (int i = 0; i < Row; i++)
+                for (int j = 0; j < Column; j++)
                 {
-                    for (int j = 0; j < Column; j++)
-                    {
-                        DNA[i, j] = false;
-                        array[Column * i + j] = Column * i + j;
-                    }
-                }
-                int tmp;
-                for (int i = 0; i < BlackSquares; i++)
-                {
-                    rng = RandomHolder.Instance.Next(0, Row * Column - i);
-                    tmp = array[rng];
-                    array[rng] = array[Row * Column - i - 1];
-                    array[Row * Column - i - 1] = tmp;
-                    l = tmp / Column;
-                    k = tmp % Column;
-                    DNA[l, k] = true;
-
+                    DNA[i, j] = false;
+                    array[Column * i + j] = Column * i + j;
                 }
             }
-            else
-                this.DNA = DNA;
+            int tmp;
+            for (int i = 0; i < BlackSquares; i++)
+            {
+                rng = RandomHolder.Instance.Next(0, Row * Column - i);
+                tmp = array[rng];
+                array[rng] = array[Row * Column - i - 1];
+                array[Row * Column - i - 1] = tmp;
+                l = tmp / Column;
+                k = tmp % Column;
+                DNA[l, k] = true;
+
+            }
 
             FindFitness(RowRules, ColumnRules);
         }
