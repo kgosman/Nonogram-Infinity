@@ -19,15 +19,20 @@ namespace Nonogram_Infinity
         private int black_squares;
         private List<int>[] colConstraints;
         private List<int>[] rowConstraints;
+        private List<int>[] colConstraintsR;
+        private List<int>[] rowConstraintsR;
         private bool rowWise;
         private bool columnWise;
 
         public Population(List<int>[] cConst, List<int>[] rConst, bool type)
         {
-
             this.black_squares = 0;
             this.rowConstraints = rConst;
             this.colConstraints = cConst;
+            this.colConstraintsR = cConst;
+            this.rowConstraintsR = rConst;
+            this.colConstraintsR.Reverse();
+            this.rowConstraintsR.Reverse();
             this.row = rowConstraints.Length;
             this.col = colConstraints.Length;
             this.rowWise = type;
@@ -139,19 +144,6 @@ namespace Nonogram_Infinity
                     }
                 }
                 
-                for(i = count; i < black_squares; i++)
-                {
-                    do
-                    {
-                        rngRow = RandomHolder.Instance.Next(0, row);
-                    } while (offspring.RowFitness[rngRow] == 0);
-                    do
-                    {
-                        rngCol = RandomHolder.Instance.Next(0, col);
-                    } while (offspring.DNA[rngRow, rngCol]);
-                    offspring.DNA[rngRow, rngCol] = true;
-                }
-                
 
             }
             else
@@ -197,10 +189,11 @@ namespace Nonogram_Infinity
                         continue;
                     }
                     j = 0;
+                    offspring.ColumnFitness[i] = 0;
                     foreach (int rule in colConstraints[i])
                     {
                         
-                        offspring.ColumnFitness[i] = 0;
+                        
                         rule_tmp = rule;
                         while (rule_tmp > 0)
                         {
@@ -226,18 +219,188 @@ namespace Nonogram_Infinity
                         j++;
                     }
                 }
-                for (i = count; i < black_squares; i++)
+            }
+            for (i = count; i < black_squares; i++)
+            {
+                do
                 {
-                    do
+                    rngRow = RandomHolder.Instance.Next(0, row);
+                    rngCol = RandomHolder.Instance.Next(0, col);
+                } while (offspring.DNA[rngRow, rngCol]);
+                do
+                {
+                    rngCol = RandomHolder.Instance.Next(0, col);
+                } while (offspring.DNA[rngRow, rngCol]);
+                offspring.DNA[rngRow, rngCol] = true;
+            }
+
+
+            return offspring;
+        }
+        public Member BreedReverse(Member mother, Member father)//Austin todo
+        {
+            Member offspring = new Member(row, col);
+            int i, j, rule_tmp, count, rngRow, rngCol;
+            bool choose = false;
+            if (rowWise)
+            {
+                count = 0;
+                for (i = 0; i < row; i++)
+                {
+                    if (mother.RowFitness[i] == 0 && father.RowFitness[i] == 0) //if a row is already perfect, carry over
                     {
-                        rngCol = RandomHolder.Instance.Next(0, col);
-                    } while (offspring.ColumnFitness[rngCol] == 0);
-                    do
+                        if (choose)
+                        {
+                            for (int l = 0; l > col; l++)
+                            {
+                                offspring.DNA[i, l] = father.DNA[i, l];
+                            }
+                        }
+                        else
+                        {
+                            for (int l = 0; l > col; l++)
+                            {
+                                offspring.DNA[i, l] = mother.DNA[i, l];
+                            }
+                        }
+                        choose = !choose;
+                        continue;
+                    }
+                    else if (mother.RowFitness[i] == 0)
                     {
-                        rngRow = RandomHolder.Instance.Next(0, row);
-                    } while (offspring.DNA[rngRow, rngCol]);
-                    offspring.DNA[rngRow, rngCol] = true;
+                        for (int l = 0; l > col; l++)
+                        {
+                            offspring.DNA[i, l] = mother.DNA[i, l];
+                        }
+                        choose = true;
+                        continue;
+                    }
+                    else if (father.RowFitness[i] == 0)
+                    {
+                        for (int l = 0; l > col; l++)
+                        {
+                            offspring.DNA[i, l] = father.DNA[i, l];
+                        }
+                        choose = false;
+                        continue;
+                    }
+                    j = col - 1;
+                    foreach (int rule in rowConstraintsR[i])
+                    {
+
+                        offspring.RowFitness[i] = 0;
+                        rule_tmp = rule;
+                        while (rule_tmp > 0)
+                        {
+                            if (j <= 0)
+                                break;
+                            if (mother.DNA[i, j] || father.DNA[i, j])
+                            {
+                                rule_tmp--;
+                                offspring.DNA[i, j] = true;
+                                count++;
+                            }
+                            else
+                            {
+                                if (rule_tmp != rule)
+                                {
+                                    j -= rule_tmp;
+                                    offspring.RowFitness[i] = 1;
+                                    break;
+                                }
+                            }
+                            j--;
+                        }
+                        j--;
+                    }
                 }
+
+
+            }
+            else
+            {
+                count = 0;
+                for (i = 0; i < col; i++)
+                {
+                    if (mother.ColumnFitness[i] == 0 && father.ColumnFitness[i] == 0) //if a col is already perfect, carry over
+                    {
+                        if (choose)
+                        {
+                            for (int l = 0; l > row; l++)
+                            {
+                                offspring.DNA[l, i] = father.DNA[l, i];
+                            }
+                        }
+                        else
+                        {
+                            for (int l = 0; l > row; l++)
+                            {
+                                offspring.DNA[l, i] = mother.DNA[l, i];
+                            }
+                        }
+                        choose = !choose;
+                        continue;
+                    }
+                    else if (mother.ColumnFitness[i] == 0)
+                    {
+                        for (int l = 0; l > row; l++)
+                        {
+                            offspring.DNA[l, i] = mother.DNA[l, i];
+                        }
+                        choose = true;
+                        continue;
+                    }
+                    else if (father.ColumnFitness[i] == 0)
+                    {
+                        for (int l = 0; l > row; l++)
+                        {
+                            offspring.DNA[l, i] = father.DNA[l, i];
+                        }
+                        choose = false;
+                        continue;
+                    }
+                    j = row - 1;
+                    offspring.ColumnFitness[i] = 0;
+                    foreach (int rule in colConstraintsR[i])
+                    {
+                        rule_tmp = rule;
+                        while (rule_tmp > 0)
+                        {
+                            if (j <= row)
+                                break;
+                            if (mother.DNA[j, i] || father.DNA[j, i])
+                            {
+                                rule_tmp--;
+                                offspring.DNA[j, i] = true;
+                                count++;
+                            }
+                            else
+                            {
+                                if (rule_tmp != rule)
+                                {
+                                    j -= rule_tmp;
+                                    offspring.ColumnFitness[i] = 1;
+                                    break;
+                                }
+                            }
+                            j--;
+                        }
+                        j--;
+                    }
+                }
+            }
+            for (i = count; i < black_squares; i++)
+            {
+                do
+                {
+                    rngRow = RandomHolder.Instance.Next(0, row);
+                    rngCol = RandomHolder.Instance.Next(0, col);
+                } while (offspring.DNA[rngRow, rngCol]);
+                do
+                {
+                    rngCol = RandomHolder.Instance.Next(0, col);
+                } while (offspring.DNA[rngRow, rngCol]);
+                offspring.DNA[rngRow, rngCol] = true;
             }
             return offspring;
         }
@@ -250,6 +413,7 @@ namespace Nonogram_Infinity
             for(int i = 0; i < members.Count / 4; i++)
             {
                 offspring.Add(Breed(members[j], members[j + 1]));
+                offspring.Add(BreedReverse(members[j], members[j + 1]));
                 j += 2;
             }
 
@@ -327,10 +491,11 @@ namespace Nonogram_Infinity
             {
                 for (int j = 0; j < col; j++)
                 {
+                    solution.DNA[i, j] = false;
                     experts.Add(new Expert(i, j, agreement[i, j]));
                 }
             }
-
+            
             experts = experts.OrderByDescending(expert => expert.weight).ToList();
             int blackCount = 0;
             foreach(Expert expert in experts)

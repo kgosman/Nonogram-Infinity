@@ -46,7 +46,7 @@ namespace Nonogram_Infinity
 
         public async void runGA(ReadFile grid, Population population1, Population population2)
         {
-            for(int i = 0; i < 100; i++)
+            for(int i = 0; i < 1; i++)
             {
                 await Task.Delay(1);
                 population1.ConsultExperts(population2);
