@@ -19,14 +19,18 @@ namespace Nonogram_Infinity
         private int black_squares;
         private List<int>[] colConstraints;
         private List<int>[] rowConstraints;
+        private bool rowWise;
+        private bool columnWise;
 
-        public Population(List<int>[] cConst, List<int>[] rConst)
+        public Population(List<int>[] cConst, List<int>[] rConst, bool type)
         {
             this.black_squares = 0;
             this.rowConstraints = rConst;
             this.colConstraints = cConst;
             this.row = rowConstraints.Length;
             this.col = colConstraints.Length;
+            rowWise = type;
+            columnWise = !type;
             for(int i = 0; i < row; i++)
             {
                 foreach(int a in rowConstraints[i])
@@ -52,6 +56,14 @@ namespace Nonogram_Infinity
         //Breeding with 2 splice points chosen at random
         public Member Breed(Member mother, Member father)//Austin todo
         {
+            if(rowWise)
+            {
+
+            }
+            else if(columnWise)
+            {
+
+            }
             return new Member(row, col, black_squares);
         }
         //Breed top 50% discard bottom 25% and replace with 25% from the resultant breeding
