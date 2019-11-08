@@ -82,7 +82,40 @@ namespace Nonogram_Infinity
         //Function to mutate a member with 2% chance
         public void Mutate(Member member) //Will todo
         {
-            
+            int row1 = 0, row2 = 1;
+
+            int col1 = 0, col2 = 1;
+
+            bool row1Okay = false, row2Okay = false, col1Okay = false, col2Okay = false;
+
+            while (true)
+            {
+                if (!row1Okay)
+                    row1 = RandomHolder.Instance.Next(0, row);
+
+                if (!row2Okay)
+                    row2 = RandomHolder.Instance.Next(0, row);
+
+                if (!col1Okay)
+                    col1 = RandomHolder.Instance.Next(0, col);
+
+                if (!col2Okay)
+                    col2 = RandomHolder.Instance.Next(0, col);
+
+                if (member.RowFitness[row1] > 0) row1Okay = true;
+
+                if (member.RowFitness[row2] > 0) row2Okay = true;
+
+                if (member.ColumnFitness[col1] > 0) col1Okay = true;
+
+                if (member.ColumnFitness[col2] > 0) col2Okay = true;
+
+                if (row1 == row2) row1Okay = row2Okay = false;
+
+                if (col1 == col2) col1Okay = col2Okay = false;
+
+                if (row1Okay && row2Okay && col1Okay && col2Okay) break;
+            }
         }
         //Mutate bottom 90% of population if elitePreservation is true
         public void MutatePopulation(bool elitePreservation)
