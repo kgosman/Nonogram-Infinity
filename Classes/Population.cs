@@ -39,6 +39,7 @@ namespace Nonogram_Infinity
             {
                 members.Add(new Member(row, col, black_squares));
             }
+            this.ConsultExperts();
         }
 
         //Clone all members in a population
@@ -78,8 +79,6 @@ namespace Nonogram_Infinity
             MutatePopulation(elitePreservation);
             members = members.OrderBy(member => member.fitness).ToList();
         }
-        //Breed top 50% discard bottom 50% add the 25% from the resultant breeding and introduce 25% new
-     
         //Function to mutate a member with 2% chance
         public void Mutate(Member member) //Will todo
         {
@@ -101,9 +100,42 @@ namespace Nonogram_Infinity
         //WoC function
         public void ConsultExperts() //Kaden todo
         {
+            int[,] agreement = new int[row,col];
 
-
-
+            foreach(Member member in members)
+            {
+                for(int i = 0; i < row; i++)
+                {
+                    for(int j = 0; j < col; j++)
+                    {
+                        if(member.dna[i,j] == true)
+                        {
+                            agreement[i, j] += 1;
+                        }
+                    }
+                }
+            }
+            solution = new Member(row, col, 0);
+            int x = 0;
+            while(x != black_squares)
+            {
+                int highestI = 0, highestJ = 0, previousMax = -1;
+                for (int i = 0; i < row; i++)
+                {
+                    for (int j = 0; j < col; j++)
+                    {
+                        if (agreement[i, j] > previousMax || previousMax == -1)
+                        {
+                            previousMax = agreement[i, j];
+                            highestI = i;
+                            highestJ = j;
+                        }
+                    }
+                }
+                agreement[highestI, highestJ] = 0;
+                solution.dna[highestI, highestJ] = true;
+                x++;
+            }
         }
     }
 }
