@@ -37,8 +37,8 @@ namespace Nonogram_Infinity
             matrix[5, 1] = true;
             Member Test = new Member(grid.numColumns, grid.numRows, 21, grid.rowConstraints, grid.colConstraints);
             Member Test2 = new Member(grid.numColumns, grid.numRows, 21, grid.rowConstraints, grid.colConstraints);
-            DrawBoard(grid, Test.dna);
-            DrawWoC(grid,Test2.dna);
+            DrawBoard(grid, Test.DNA);
+            DrawWoC(grid,Test2.DNA);
             
         }
 

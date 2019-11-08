@@ -76,7 +76,7 @@ namespace Nonogram_Infinity
                 members.Add(child);
             }
             MutatePopulation(elitePreservation);
-            members = members.OrderBy(member => member.fitness).ToList();
+            members = members.OrderBy(member => member.Fitness).ToList();
         }
         //Breed top 50% discard bottom 50% add the 25% from the resultant breeding and introduce 25% new
      
