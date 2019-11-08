@@ -111,11 +111,14 @@ namespace Nonogram_Infinity
                     j = 0;
                     foreach(int rule in rowConstraints[i])
                     {
+                        
                         offspring.RowFitness[i] = 0;
                         rule_tmp = rule;
                         while(rule_tmp > 0)
                         {
-                            if(mother.DNA[i, j] || father.DNA[i, j])
+                            if (j >= col)
+                                break;
+                            if (mother.DNA[i, j] || father.DNA[i, j])
                             {
                                 rule_tmp--;
                                 offspring.DNA[i, j] = true;
@@ -125,6 +128,7 @@ namespace Nonogram_Infinity
                             {
                                 if (rule_tmp != rule)
                                 {
+                                    j += rule_tmp;
                                     offspring.RowFitness[i] = 1;
                                     break;
                                 }
@@ -195,10 +199,13 @@ namespace Nonogram_Infinity
                     j = 0;
                     foreach (int rule in colConstraints[i])
                     {
+                        
                         offspring.ColumnFitness[i] = 0;
                         rule_tmp = rule;
                         while (rule_tmp > 0)
                         {
+                            if (j >= row)
+                                break;
                             if (mother.DNA[j, i] || father.DNA[j, i])
                             {
                                 rule_tmp--;
@@ -209,6 +216,7 @@ namespace Nonogram_Infinity
                             {
                                 if (rule_tmp != rule)
                                 {
+                                    j += rule_tmp;
                                     offspring.ColumnFitness[i] = 1;
                                     break;
                                 }
@@ -254,7 +262,7 @@ namespace Nonogram_Infinity
                 child.FindFitness(rowConstraints, colConstraints);
                 members.Add(child);
             }
-            MutatePopulation(elitePreservation);
+            //MutatePopulation(elitePreservation);
             members = members.OrderBy(member => member.Fitness).ToList();
         }
         //Mutate bottom 90% of population if elitePreservation is true
@@ -270,8 +278,21 @@ namespace Nonogram_Infinity
                 j++;
             }
         }
+
+        public class Expert
+        {
+            public int i;
+            public int j;
+            public int weight;
+            public Expert(int i, int j, int weight)
+            {
+                this.i = i;
+                this.j = j;
+                this.weight = weight;
+            }
+        }
         //WoC function
-        public void ConsultExperts() //Kaden todo
+        public void ConsultExperts(Population population) //Kaden todo
         {
             int[,] agreement = new int[row,col];
 
@@ -288,26 +309,38 @@ namespace Nonogram_Infinity
                     }
                 }
             }
-            solution = new Member(row, col, 0, rowConstraints, colConstraints);
-            int x = 0;
-            while(x != black_squares)
+            foreach (Member member in population.members)
             {
-                int highestI = 0, highestJ = 0, previousMax = -1;
                 for (int i = 0; i < row; i++)
                 {
                     for (int j = 0; j < col; j++)
                     {
-                        if (agreement[i, j] > previousMax || previousMax == -1)
+                        if (member.DNA[i, j] == true)
                         {
-                            previousMax = agreement[i, j];
-                            highestI = i;
-                            highestJ = j;
+                            agreement[i, j] += 1;
                         }
                     }
                 }
-                agreement[highestI, highestJ] = 0;
-                solution.DNA[highestI, highestJ] = true;
-                x++;
+            }
+            List<Expert> experts = new List<Expert>();
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    experts.Add(new Expert(i, j, agreement[i, j]));
+                }
+            }
+
+            experts = experts.OrderByDescending(expert => expert.weight).ToList();
+            int blackCount = 0;
+            foreach(Expert expert in experts)
+            {
+                if(blackCount == black_squares)
+                {
+                    break;
+                }
+                solution.DNA[expert.i, expert.j] = true;
+                blackCount++;
             }
         }
     }
