@@ -13,36 +13,26 @@ namespace Nonogram_Infinity
         private readonly int Row;
         private readonly int Column;
 
-        public List<int> RowFitness { get; private set; }
-        public List<int> ColumnFitness { get; private set; }
+        public int[] RowFitness { get; private set; }
+        public int[] ColumnFitness { get; private set; }
         public Member(int row, int col)
         {
             Fitness = 0;
-            this.Row = row;
-            this.Column = col;
-            this.DNA = new bool[this.Row, this.Column];
-            RowFitness = new List<int>(Row);
-            for(int i = 0; i < Row; i++)
-            {
-                RowFitness.Add(0);
-            }
-            ColumnFitness = new List<int>(Column);
-            for (int i = 0; i < Column; i++)
-            {
-                ColumnFitness.Add(0);
-            }
+            Row = row;
+            Column = col;
+            DNA = new bool[Row, Column];
+            RowFitness = new int[Row];
+            ColumnFitness = new int[Column];
         }
         public Member (int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules)
         {
             Fitness = 0;
             this.Row = Row;
             this.Column = Column;
+            RowFitness = new int[Row];
+            ColumnFitness = new int[Column];
 
-            RowFitness = new List<int>(Row);
-
-            ColumnFitness = new List<int>(Column);
-
-            this.DNA = new bool[this.Row, this.Column];
+            DNA = new bool[this.Row, this.Column];
 
             int l, k, rng;
             int[] array = new int[Row * Column];
@@ -64,21 +54,17 @@ namespace Nonogram_Infinity
                 l = tmp / Column;
                 k = tmp % Column;
                 DNA[l, k] = true;
-
             }
-
             FindFitness(RowRules, ColumnRules);
         }
 
-        public Member(int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA)
+        public Member(int Row, int Column, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA)
         {
             Fitness = 0;
             this.Row = Row;
             this.Column = Column;
-
-            RowFitness = new List<int>(Row);
-
-            ColumnFitness = new List<int>(Column);
+            RowFitness = new int[Row];
+            ColumnFitness = new int[Column];
 
             this.DNA = DNA;
 
@@ -155,7 +141,7 @@ namespace Nonogram_Infinity
                     totalBlackSquares *= -1;
 
                 fitness += totalBlackSquares;
-                RowFitness.Add(fitness);
+                RowFitness[i] = fitness;
             }
         }
 
@@ -206,7 +192,7 @@ namespace Nonogram_Infinity
 
                 fitness += totalBlackSquares;
 
-                ColumnFitness.Add(fitness);
+                ColumnFitness[j] = fitness;
             }
         }
 
