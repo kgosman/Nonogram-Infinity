@@ -13,13 +13,17 @@ namespace Nonogram_Infinity
         private readonly int Row;
         private readonly int Column;
 
-        public int RowFitness { get; private set; }
-        public int ColumnFitness { get; private set; }
+        public List<int> RowFitness { get; private set; }
+        public List<int> ColumnFitness { get; private set; }
         public Member (int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA = null)
         {
             Fitness = 0;
             this.Row = Row;
             this.Column = Column;
+
+            RowFitness = new List<int>(Row);
+
+            ColumnFitness = new List<int>(Column);
 
             if (DNA == null)
             {
@@ -62,7 +66,11 @@ namespace Nonogram_Infinity
             RowWiseFitness(RowRules);
             ColumnWiseFitness(ColumnRules);
 
-            Fitness = RowFitness + ColumnFitness;
+            foreach (int fitness in RowFitness)
+                Fitness += fitness;
+
+            foreach (int fitness in ColumnFitness)
+                Fitness += fitness;
         }
 
         public void RowWiseFitness(List<int>[] RowRules)
@@ -75,12 +83,17 @@ namespace Nonogram_Infinity
             {
                 State currentState = State.INITIAL_STATE;
 
+                int totalBlackSquares = 0;
+
                 for (int j = RowRules[i].Count - 1; j >= 0; j--)
                 {
                     currentStack.Push(false);
 
                     for (int k = 0; k < RowRules[i][j]; k++)
+                    {
                         currentStack.Push(true);
+                        totalBlackSquares++;
+                    }
                 }
 
                 for (int j = 0; j < Column; j++)
@@ -89,6 +102,9 @@ namespace Nonogram_Infinity
 
                     if (currentState == State.RULE_BROKEN)
                         fitness++;
+
+                    if (currentState == State.COUNTING_RUNS)
+                        totalBlackSquares--;
                 }
 
                 while (currentStack.Count != 0)
@@ -98,9 +114,13 @@ namespace Nonogram_Infinity
 
                     currentStack.Pop();
                 }
-            }
 
-            RowFitness = fitness;
+                if (totalBlackSquares < 0)
+                    totalBlackSquares *= -1;
+
+                fitness += totalBlackSquares;
+                RowFitness.Add(fitness);
+            }
         }
 
         public void ColumnWiseFitness(List<int>[] ColumnRules)
@@ -113,12 +133,17 @@ namespace Nonogram_Infinity
             {
                 State currentState = State.INITIAL_STATE;
 
+                int totalBlackSquares = 0;
+
                 for (int i = ColumnRules[j].Count - 1; i >= 0; i--)
                 {
                     currentStack.Push(false);
 
                     for (int k = 0; k < ColumnRules[j][i]; k++)
+                    {
                         currentStack.Push(true);
+                        totalBlackSquares++;
+                    }
                 }
 
                 for (int i = 0; i < Row; i++)
@@ -127,6 +152,9 @@ namespace Nonogram_Infinity
 
                     if (currentState == State.RULE_BROKEN)
                         fitness++;
+
+                    if (currentState == State.COUNTING_RUNS)
+                        totalBlackSquares--;
                 }
 
                 while (currentStack.Count != 0)
@@ -136,9 +164,14 @@ namespace Nonogram_Infinity
 
                     currentStack.Pop();
                 }
-            }
 
-            ColumnFitness = fitness;
+                if (totalBlackSquares < 0)
+                    totalBlackSquares *= -1;
+
+                fitness += totalBlackSquares;
+
+                ColumnFitness.Add(fitness);
+            }
         }
 
         //Clone a members dna
