@@ -19,18 +19,14 @@ namespace Nonogram_Infinity
         private int black_squares;
         private List<int>[] colConstraints;
         private List<int>[] rowConstraints;
-        private bool rowWise;
-        private bool columnWise;
 
-        public Population(List<int>[] cConst, List<int>[] rConst, bool type)
+        public Population(List<int>[] cConst, List<int>[] rConst)
         {
             this.black_squares = 0;
             this.rowConstraints = rConst;
             this.colConstraints = cConst;
             this.row = rowConstraints.Length;
             this.col = colConstraints.Length;
-            rowWise = type;
-            columnWise = !type;
             for(int i = 0; i < row; i++)
             {
                 foreach(int a in rowConstraints[i])
@@ -41,8 +37,9 @@ namespace Nonogram_Infinity
             this.members = new List<Member>(100);
             for(int i = 0; i < 100; i++)
             {
-                members.Add(new Member(row, col, black_squares));
+                members.Add(new Member(row, col, black_squares, rowConstraints, colConstraints));
             }
+            this.ConsultExperts();
         }
 
         //Clone all members in a population
@@ -56,15 +53,7 @@ namespace Nonogram_Infinity
         //Breeding with 2 splice points chosen at random
         public Member Breed(Member mother, Member father)//Austin todo
         {
-            if(rowWise)
-            {
-
-            }
-            else if(columnWise)
-            {
-
-            }
-            return new Member(row, col, black_squares);
+            return new Member(row, col, black_squares, rowConstraints, colConstraints);
         }
         //Breed top 50% discard bottom 25% and replace with 25% from the resultant breeding
         public void BreedPopulaton(bool elitePreservation)//***********done************
@@ -84,14 +73,12 @@ namespace Nonogram_Infinity
             }
             foreach(Member child in offspring)
             {
-                child.FindFitness();
+                child.FindFitness(rowConstraints, colConstraints);
                 members.Add(child);
             }
             MutatePopulation(elitePreservation);
             members = members.OrderBy(member => member.fitness).ToList();
         }
-        //Breed top 50% discard bottom 50% add the 25% from the resultant breeding and introduce 25% new
-     
         //Function to mutate a member with 2% chance
         public void Mutate(Member member) //Will todo
         {
@@ -113,9 +100,42 @@ namespace Nonogram_Infinity
         //WoC function
         public void ConsultExperts() //Kaden todo
         {
+            int[,] agreement = new int[row,col];
 
-
-
+            foreach(Member member in members)
+            {
+                for(int i = 0; i < row; i++)
+                {
+                    for(int j = 0; j < col; j++)
+                    {
+                        if(member.dna[i,j] == true)
+                        {
+                            agreement[i, j] += 1;
+                        }
+                    }
+                }
+            }
+            solution = new Member(row, col, 0);
+            int x = 0;
+            while(x != black_squares)
+            {
+                int highestI = 0, highestJ = 0, previousMax = -1;
+                for (int i = 0; i < row; i++)
+                {
+                    for (int j = 0; j < col; j++)
+                    {
+                        if (agreement[i, j] > previousMax || previousMax == -1)
+                        {
+                            previousMax = agreement[i, j];
+                            highestI = i;
+                            highestJ = j;
+                        }
+                    }
+                }
+                agreement[highestI, highestJ] = 0;
+                solution.dna[highestI, highestJ] = true;
+                x++;
+            }
         }
     }
 }
