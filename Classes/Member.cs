@@ -15,7 +15,24 @@ namespace Nonogram_Infinity
 
         public List<int> RowFitness { get; private set; }
         public List<int> ColumnFitness { get; private set; }
-        public Member (int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA = null)
+        public Member(int row, int col)
+        {
+            Fitness = 0;
+            this.Row = row;
+            this.Column = col;
+            this.DNA = new bool[this.Row, this.Column];
+            RowFitness = new List<int>(Row);
+            for(int i = 0; i < Row; i++)
+            {
+                RowFitness.Add(0);
+            }
+            ColumnFitness = new List<int>(Column);
+            for (int i = 0; i < Column; i++)
+            {
+                ColumnFitness.Add(0);
+            }
+        }
+        public Member (int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules)
         {
             Fitness = 0;
             this.Row = Row;
@@ -25,8 +42,7 @@ namespace Nonogram_Infinity
 
             ColumnFitness = new List<int>(Column);
 
-            if (DNA == null)
-            {
+
                 this.DNA = new bool[this.Row, this.Column];
 
 
@@ -52,9 +68,7 @@ namespace Nonogram_Infinity
                     DNA[l, k] = true;
 
                 }
-            }
-            else
-                this.DNA = DNA;
+
 
             FindFitness(RowRules, ColumnRules);
         }

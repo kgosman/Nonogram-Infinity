@@ -33,7 +33,7 @@ namespace Nonogram_Infinity
             };
             grid.MakeConstraints();
 
-            Population population = new Population(grid.colConstraints, grid.rowConstraints);
+            Population population = new Population(grid.colConstraints, grid.rowConstraints, true);
 
             double xSpace = myRowCanvas.Width / grid.numColumns;
             double ySpace = myRowCanvas.Height / grid.numRows;
@@ -46,8 +46,8 @@ namespace Nonogram_Infinity
 
             xSpace = wocCanvas.Width / grid.numColumns;
             ySpace = wocCanvas.Height / grid.numRows;
-
-            DrawWoC(grid,grid.solution, xSpace, ySpace);
+            
+            DrawWoC(grid,population.get().DNA, xSpace, ySpace);
         }
 
         public void DrawColBoard(ReadFile grid, bool[,] matrix, double xSpace, double ySpace)
