@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nonogram_Infinity
 {
@@ -97,12 +94,11 @@ namespace Nonogram_Infinity
 
         private void RowWiseFitness(List<int>[] RowRules)
         {
-            int fitness = 0;
-
             Stack<bool> currentStack = new Stack<bool>();
 
             for (int i = 0; i < Row; i++)
             {
+                int fitness = 0;
                 State currentState = State.INITIAL_STATE;
 
                 int totalBlackSquares = 0;
@@ -130,12 +126,7 @@ namespace Nonogram_Infinity
                 }
 
                 while (currentStack.Count != 0)
-                {
-                    if (currentStack.Peek())
-                        fitness++;
-
                     currentStack.Pop();
-                }
 
                 if (totalBlackSquares < 0)
                     totalBlackSquares *= -1;
@@ -147,12 +138,14 @@ namespace Nonogram_Infinity
 
         private void ColumnWiseFitness(List<int>[] ColumnRules)
         {
-            int fitness = 0;
+            int fitness;
 
             Stack<bool> currentStack = new Stack<bool>();
 
             for (int j = 0; j < Column; j++)
             {
+                fitness = 0;
+
                 State currentState = State.INITIAL_STATE;
 
                 int totalBlackSquares = 0;
@@ -181,9 +174,6 @@ namespace Nonogram_Infinity
 
                 while (currentStack.Count != 0)
                 {
-                    if (currentStack.Peek())
-                        fitness++;
-
                     currentStack.Pop();
                 }
 
@@ -191,13 +181,13 @@ namespace Nonogram_Infinity
                     totalBlackSquares *= -1;
 
                 fitness += totalBlackSquares;
-
+                
                 ColumnFitness[j] = fitness;
             }
         }
 
         /// <summary>
-        /// Copies input into DNA
+        /// Copies <paramref name="copyDNA"/> into DNA
         /// </summary>
         /// <param name="copyDNA"></param>
         public void Clone(bool[,] copyDNA)
@@ -292,18 +282,19 @@ namespace Nonogram_Infinity
     {
         public static State Delta(State currentState, bool value, ref Stack<bool> currentStack)
         {
-            if ((currentState == State.INITIAL_STATE || currentState == State.COUNTING_RUNS) 
+            if ((currentState == State.INITIAL_STATE || currentState == State.COUNTING_RUNS || currentState == State.NO_BLACK_SQAURES_ENCOUNTERED)
                     && value == currentStack.Peek() && !currentStack.Peek())
                 currentState = State.INITIAL_STATE;
 
-            if (currentState == State.COUNTING_RUNS && currentStack.Peek() != value)
+            else if (currentState == State.COUNTING_RUNS && currentStack.Peek() != value && 
+                    ((currentStack.Peek() && !value) || (!currentStack.Peek() && value)))
             {
                 currentState = State.RULE_BROKEN;
 
                 currentStack.Pop();
             }
 
-            if (currentState == State.COUNTING_RUNS
+            else if (currentState == State.COUNTING_RUNS
                     && currentStack.Peek() == value && currentStack.Peek())
             {
                 currentState = State.COUNTING_RUNS;
@@ -311,7 +302,7 @@ namespace Nonogram_Infinity
                 currentStack.Pop();
             }
 
-            if (currentState == State.INITIAL_STATE && value != currentStack.Peek() && !currentStack.Peek())
+            else if (currentState == State.INITIAL_STATE && value != currentStack.Peek() && !currentStack.Peek())
             {
                 currentState = State.COUNTING_RUNS;
                 currentStack.Pop();
@@ -322,12 +313,18 @@ namespace Nonogram_Infinity
                     currentState = State.RULE_BROKEN;
             }
 
-            if (currentState == State.INITIAL_STATE && value == currentStack.Peek() && currentStack.Peek())
+            else if (currentState == State.INITIAL_STATE && value == currentStack.Peek() && currentStack.Peek())
             {
                 currentState = State.COUNTING_RUNS;
 
                 currentStack.Pop();
             }
+
+            else if (currentState == State.RULE_BROKEN && currentStack.Count > 0 ? value == currentStack.Peek() : false && value)
+                currentState = State.COUNTING_RUNS;
+
+            else if (currentState == State.RULE_BROKEN && currentStack.Count > 0 ? value == currentStack.Peek() : false && !value)
+                currentState = State.INITIAL_STATE;
 
             return currentState;
         }
@@ -335,6 +332,7 @@ namespace Nonogram_Infinity
 
     enum State
     {
+        NO_BLACK_SQAURES_ENCOUNTERED,
         INITIAL_STATE,
         COUNTING_RUNS,
         RULE_BROKEN
