@@ -44,13 +44,13 @@ namespace Nonogram_Infinity
             LabelColumns(xSpace, grid.colConstraints, grid.numColumns);
             LabelRows(ySpace, grid.rowConstraints, grid.numRows);
 
-            DrawColBoard(grid, population.members[0].dna,xSpace,ySpace);
-            DrawRowBoard(grid, population.members[1].dna, xSpace, ySpace);
+            DrawColBoard(grid, population.members[0].DNA,xSpace,ySpace);
+            DrawRowBoard(grid, population.members[1].DNA, xSpace, ySpace);
 
             xSpace = wocCanvas.Width / grid.numColumns;
             ySpace = wocCanvas.Height / grid.numRows;
-
-            DrawWoC(grid,grid.solution, xSpace, ySpace);
+            
+            DrawWoC(grid,population.get().DNA, xSpace, ySpace);
         }
 
         public void DrawColBoard(ReadFile grid, bool[,] matrix, double xSpace, double ySpace)
