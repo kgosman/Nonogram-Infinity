@@ -77,7 +77,7 @@ namespace Nonogram_Infinity
                 members.Add(child);
             }
             MutatePopulation(elitePreservation);
-            members = members.OrderBy(member => member.fitness).ToList();
+            members = members.OrderBy(member => member.Fitness).ToList();
         }
         //Function to mutate a member with 2% chance
         public void Mutate(Member member) //Will todo
