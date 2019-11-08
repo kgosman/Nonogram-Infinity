@@ -111,11 +111,14 @@ namespace Nonogram_Infinity
                     j = 0;
                     foreach(int rule in rowConstraints[i])
                     {
+                        
                         offspring.RowFitness[i] = 0;
                         rule_tmp = rule;
                         while(rule_tmp > 0)
                         {
-                            if(mother.DNA[i, j] || father.DNA[i, j])
+                            if (j >= col)
+                                break;
+                            if (mother.DNA[i, j] || father.DNA[i, j])
                             {
                                 rule_tmp--;
                                 offspring.DNA[i, j] = true;
@@ -125,6 +128,7 @@ namespace Nonogram_Infinity
                             {
                                 if (rule_tmp != rule)
                                 {
+                                    j += rule_tmp;
                                     offspring.RowFitness[i] = 1;
                                     break;
                                 }
@@ -195,10 +199,13 @@ namespace Nonogram_Infinity
                     j = 0;
                     foreach (int rule in colConstraints[i])
                     {
+                        
                         offspring.ColumnFitness[i] = 0;
                         rule_tmp = rule;
                         while (rule_tmp > 0)
                         {
+                            if (j >= row)
+                                break;
                             if (mother.DNA[j, i] || father.DNA[j, i])
                             {
                                 rule_tmp--;
@@ -209,6 +216,7 @@ namespace Nonogram_Infinity
                             {
                                 if (rule_tmp != rule)
                                 {
+                                    j += rule_tmp;
                                     offspring.ColumnFitness[i] = 1;
                                     break;
                                 }
@@ -254,7 +262,7 @@ namespace Nonogram_Infinity
                 child.FindFitness(rowConstraints, colConstraints);
                 members.Add(child);
             }
-            MutatePopulation(elitePreservation);
+            //MutatePopulation(elitePreservation);
             members = members.OrderBy(member => member.Fitness).ToList();
         }
         //Function to mutate a member with 2% chance
@@ -345,7 +353,7 @@ namespace Nonogram_Infinity
                 {
                     for (int j = 0; j < col; j++)
                     {
-                        if (member.dna[i, j] == true)
+                        if (member.DNA[i, j] == true)
                         {
                             agreement[i, j] += 1;
                         }
@@ -369,7 +377,7 @@ namespace Nonogram_Infinity
                 {
                     break;
                 }
-                solution.dna[expert.i, expert.j] = true;
+                solution.DNA[expert.i, expert.j] = true;
                 blackCount++;
             }
         }

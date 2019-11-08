@@ -29,30 +29,42 @@ namespace Nonogram_Infinity
 
             ReadFile grid = new ReadFile
             {
-                filepath = di.FullName + "\\Data\\Lizard.txt"
+                filepath = di.FullName + "\\Data\\Circle.txt"
             };
             grid.MakeConstraints();
 
-            Population population = new Population(grid.colConstraints, grid.rowConstraints);
-            Population population2 = new Population(grid.colConstraints, grid.rowConstraints);
-
-            population.ConsultExperts(population2);
-
+            Population population = new Population(grid.colConstraints, grid.rowConstraints, false);
+            Population population2 = new Population(grid.colConstraints, grid.rowConstraints, true);
             double xSpace = myRowCanvas.Width / grid.numColumns;
             double ySpace = myRowCanvas.Height / grid.numRows;
 
             LabelColumns(xSpace, grid.colConstraints, grid.numColumns);
             LabelRows(ySpace, grid.rowConstraints, grid.numRows);
+            runGA(grid, population,population2);
 
-            DrawColBoard(grid, population.members[0].DNA,xSpace,ySpace);
-            DrawRowBoard(grid, population.members[1].DNA, xSpace, ySpace);
-
-            xSpace = wocCanvas.Width / grid.numColumns;
-            ySpace = wocCanvas.Height / grid.numRows;
-            
-            DrawWoC(grid,population.get().DNA, xSpace, ySpace);
         }
 
+        public async void runGA(ReadFile grid, Population population1, Population population2)
+        {
+            for(int i = 0; i < 100; i++)
+            {
+                await Task.Delay(1);
+                population1.ConsultExperts(population2);
+
+                double xSpace = myRowCanvas.Width / grid.numColumns;
+                double ySpace = myRowCanvas.Height / grid.numRows;
+
+                DrawColBoard(grid, population1.members[0].DNA, xSpace, ySpace);
+                DrawRowBoard(grid, population2.members[0].DNA, xSpace, ySpace);
+
+                xSpace = wocCanvas.Width / grid.numColumns;
+                ySpace = wocCanvas.Height / grid.numRows;
+
+                DrawWoC(grid, population1.solution.DNA, xSpace, ySpace);
+                population1.BreedPopulaton(true);
+                population2.BreedPopulaton(true);
+            }
+        }
         public void DrawColBoard(ReadFile grid, bool[,] matrix, double xSpace, double ySpace)
         {
             myColCanvas.Children.Clear();
