@@ -34,6 +34,9 @@ namespace Nonogram_Infinity
             grid.MakeConstraints();
 
             Population population = new Population(grid.colConstraints, grid.rowConstraints);
+            Population population2 = new Population(grid.colConstraints, grid.rowConstraints);
+
+            population.ConsultExperts(population2);
 
             double xSpace = myRowCanvas.Width / grid.numColumns;
             double ySpace = myRowCanvas.Height / grid.numRows;

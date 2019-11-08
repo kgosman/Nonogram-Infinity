@@ -15,43 +15,37 @@ namespace Nonogram_Infinity
 
         public int RowFitness { get; private set; }
         public int ColumnFitness { get; private set; }
-        public Member (int row, int col, int black_squares, List<int>[] rowRules, List<int>[] columnRules, bool[,] dna = null)
+        public Member (int row, int col, int black_squares, List<int>[] rowRules, List<int>[] columnRules)
         {
             this.fitness = 0;
             this.row = row;
             this.col = col;
-
-            if (dna == null)
+            
+            this.dna = new bool[this.row, this.col];
+        
+            int l, k, rng;
+            int[] array = new int[row * col];
+            for (int i = 0; i < row; i++)
             {
-                this.dna = new bool[this.row, this.col];
-
-
-                int l, k, rng;
-                int[] array = new int[row * col];
-                for (int i = 0; i < row; i++)
+                for (int j = 0; j < col; j++)
                 {
-                    for (int j = 0; j < col; j++)
-                    {
-                        dna[i, j] = false;
-                        array[col * i + j] = col * i + j;
-                    }
-                }
-                int tmp;
-                for (int i = 0; i < black_squares; i++)
-                {
-                    rng = RandomHolder.Instance.Next(0, row * col - i);
-                    tmp = array[rng];
-                    array[rng] = array[row * col - i - 1];
-                    array[row * col - i - 1] = tmp;
-                    l = tmp / col;
-                    k = tmp % col;
-                    dna[l, k] = true;
-
+                    dna[i, j] = false;
+                    array[col * i + j] = col * i + j;
                 }
             }
-            else
-                this.dna = dna;
+            int tmp;
+            for (int i = 0; i < black_squares; i++)
+            {
+                rng = RandomHolder.Instance.Next(0, row * col - i);
+                tmp = array[rng];
+                array[rng] = array[row * col - i - 1];
+                array[row * col - i - 1] = tmp;
+                l = tmp / col;
+                k = tmp % col;
+                dna[l, k] = true;
 
+                }
+            
             FindFitness(rowRules, columnRules);
         }
         //Calculate fitness of the dna

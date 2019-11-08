@@ -39,7 +39,6 @@ namespace Nonogram_Infinity
             {
                 members.Add(new Member(row, col, black_squares, rowConstraints, colConstraints));
             }
-            this.ConsultExperts();
         }
 
         //Clone all members in a population
@@ -97,8 +96,21 @@ namespace Nonogram_Infinity
                 i++;
             }
         }
+
+        public class Expert
+        {
+            public int i;
+            public int j;
+            public int weight;
+            public Expert(int i, int j, int weight)
+            {
+                this.i = i;
+                this.j = j;
+                this.weight = weight;
+            }
+        }
         //WoC function
-        public void ConsultExperts() //Kaden todo
+        public void ConsultExperts(Population population) //Kaden todo
         {
             int[,] agreement = new int[row,col];
 
@@ -115,26 +127,38 @@ namespace Nonogram_Infinity
                     }
                 }
             }
-            solution = new Member(row, col, 0);
-            int x = 0;
-            while(x != black_squares)
+            foreach (Member member in population.members)
             {
-                int highestI = 0, highestJ = 0, previousMax = -1;
                 for (int i = 0; i < row; i++)
                 {
                     for (int j = 0; j < col; j++)
                     {
-                        if (agreement[i, j] > previousMax || previousMax == -1)
+                        if (member.dna[i, j] == true)
                         {
-                            previousMax = agreement[i, j];
-                            highestI = i;
-                            highestJ = j;
+                            agreement[i, j] += 1;
                         }
                     }
                 }
-                agreement[highestI, highestJ] = 0;
-                solution.dna[highestI, highestJ] = true;
-                x++;
+            }
+            List<Expert> experts = new List<Expert>();
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    experts.Add(new Expert(i, j, agreement[i, j]));
+                }
+            }
+
+            experts = experts.OrderByDescending(expert => expert.weight).ToList();
+            int blackCount = 0;
+            foreach(Expert expert in experts)
+            {
+                if(blackCount == black_squares)
+                {
+                    break;
+                }
+                solution.dna[expert.i, expert.j] = true;
+                blackCount++;
             }
         }
     }
