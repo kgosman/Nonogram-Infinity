@@ -108,14 +108,14 @@ namespace Nonogram_Infinity
                 {
                     for(int j = 0; j < col; j++)
                     {
-                        if(member.dna[i,j] == true)
+                        if(member.DNA[i,j] == true)
                         {
                             agreement[i, j] += 1;
                         }
                     }
                 }
             }
-            solution = new Member(row, col, 0);
+            solution = new Member(row, col, 0, rowConstraints, colConstraints);
             int x = 0;
             while(x != black_squares)
             {
@@ -133,7 +133,7 @@ namespace Nonogram_Infinity
                     }
                 }
                 agreement[highestI, highestJ] = 0;
-                solution.dna[highestI, highestJ] = true;
+                solution.DNA[highestI, highestJ] = true;
                 x++;
             }
         }

@@ -41,8 +41,8 @@ namespace Nonogram_Infinity
             LabelColumns(xSpace, grid.colConstraints, grid.numColumns);
             LabelRows(ySpace, grid.rowConstraints, grid.numRows);
 
-            DrawColBoard(grid, population.members[0].dna,xSpace,ySpace);
-            DrawRowBoard(grid, population.members[1].dna, xSpace, ySpace);
+            DrawColBoard(grid, population.members[0].DNA,xSpace,ySpace);
+            DrawRowBoard(grid, population.members[1].DNA, xSpace, ySpace);
 
             xSpace = wocCanvas.Width / grid.numColumns;
             ySpace = wocCanvas.Height / grid.numRows;
