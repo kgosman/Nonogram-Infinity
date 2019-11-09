@@ -46,7 +46,7 @@ namespace Nonogram_Infinity
 
         public async void runGA(ReadFile grid, Population population1, Population population2)
         {
-            for(int i = 0; i < 1; i++)
+            for(int i = 0; i < 1000; i++)
             {
                 await Task.Delay(1);
                 population1.ConsultExperts(population2);
@@ -54,18 +54,18 @@ namespace Nonogram_Infinity
                 double xSpace = myRowCanvas.Width / grid.numColumns;
                 double ySpace = myRowCanvas.Height / grid.numRows;
 
-                DrawColBoard(grid, population1.members[0].DNA, xSpace, ySpace);
-                DrawRowBoard(grid, population2.members[0].DNA, xSpace, ySpace);
+                DrawColBoard(grid, population1.members[0], xSpace, ySpace);
+                DrawRowBoard(grid, population2.members[0], xSpace, ySpace);
 
                 xSpace = wocCanvas.Width / grid.numColumns;
                 ySpace = wocCanvas.Height / grid.numRows;
 
-                DrawWoC(grid, population1.solution.DNA, xSpace, ySpace);
+                DrawWoC(grid, population1.solution, xSpace, ySpace);
                 population1.BreedPopulaton(true);
                 population2.BreedPopulaton(true);
             }
         }
-        public void DrawColBoard(ReadFile grid, bool[,] matrix, double xSpace, double ySpace)
+        public void DrawColBoard(ReadFile grid, Member member, double xSpace, double ySpace)
         {
             myColCanvas.Children.Clear();
 
@@ -79,7 +79,7 @@ namespace Nonogram_Infinity
                         Width = xSpace,
                         Height = ySpace
                     };
-                    if(matrix[i,j] == true)
+                    if(member.DNA[i,j] == true)
                     {
                         rectangle.Fill = Brushes.Black;
                         if(grid.solution[i,j] == true)
@@ -92,8 +92,12 @@ namespace Nonogram_Infinity
                     myColCanvas.Children.Add(rectangle);
                 }
             }
+            TextBlock text = new TextBlock();
+            Canvas.SetLeft(text, 400);
+            text.Text = "Best Column Fitness = " + member.Fitness.ToString();
+            myColCanvas.Children.Add(text);
         }
-        public void DrawRowBoard(ReadFile grid, bool[,] matrix, double xSpace, double ySpace)
+        public void DrawRowBoard(ReadFile grid, Member member, double xSpace, double ySpace)
         {
             myRowCanvas.Children.Clear();
                                    
@@ -107,7 +111,7 @@ namespace Nonogram_Infinity
                         Width = xSpace,
                         Height = ySpace
                     };
-                    if (matrix[i, j] == true)
+                    if (member.DNA[i, j] == true)
                     {
                         rectangle.Fill = Brushes.Black;
                         if (grid.solution[i, j] == true)
@@ -120,8 +124,12 @@ namespace Nonogram_Infinity
                     myRowCanvas.Children.Add(rectangle);
                 }
             }
+            TextBlock text = new TextBlock();
+            Canvas.SetLeft(text, 400);
+            text.Text = "Best Row Fitness = " + member.Fitness.ToString();
+            myRowCanvas.Children.Add(text);
         }
-        public void DrawWoC(ReadFile grid, bool[,] matrix,double xSpace, double ySpace)
+        public void DrawWoC(ReadFile grid, Member member,double xSpace, double ySpace)
         {
             wocCanvas.Children.Clear();
 
@@ -135,7 +143,7 @@ namespace Nonogram_Infinity
                         Width = xSpace,
                         Height = ySpace
                     };
-                    if (matrix[i, j] == true)
+                    if (member.DNA[i, j] == true)
                     {
                         rectangle.Fill = Brushes.Black;
                         if (grid.solution[i, j] == true)
@@ -148,6 +156,10 @@ namespace Nonogram_Infinity
                     wocCanvas.Children.Add(rectangle);
                 }
             }
+            TextBlock text = new TextBlock();
+            Canvas.SetTop(text, 600);
+            text.Text = "Wisdom of Crowds Fitness = " + member.Fitness.ToString();
+            wocCanvas.Children.Add(text);
         }
         public void LabelColumns(double xSpace,List<int>[] colConstraints, int numColumns)
         {
