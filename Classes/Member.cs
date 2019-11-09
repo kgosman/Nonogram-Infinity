@@ -116,12 +116,15 @@ namespace Nonogram_Infinity
 
                 for (int j = 0; j < Column; j++)
                 {
-                    currentState = StateMachine.Delta(currentState, DNA[i, j], ref currentStack);
+                    currentState = StateMachine.OtherDelta(currentState, DNA[i, j], ref currentStack);
 
                     if (currentState == State.RULE_BROKEN)
+                    {
                         fitness++;
+                        currentState = State.COUNTING_BLACK_RUNS;
+                    }
 
-                    if (currentState == State.COUNTING_RUNS)
+                    if (currentState == State.COUNTING_BLACK_RUNS)
                         totalBlackSquares--;
                 }
 
@@ -163,12 +166,15 @@ namespace Nonogram_Infinity
 
                 for (int i = 0; i < Row; i++)
                 {
-                    currentState = StateMachine.Delta(currentState, DNA[i, j], ref currentStack);
+                    currentState = StateMachine.OtherDelta(currentState, DNA[i, j], ref currentStack);
 
                     if (currentState == State.RULE_BROKEN)
+                    {
                         fitness++;
+                        currentState = State.COUNTING_BLACK_RUNS;
+                    }
 
-                    if (currentState == State.COUNTING_RUNS)
+                    if (currentState == State.COUNTING_BLACK_RUNS)
                         totalBlackSquares--;
                 }
 
@@ -328,6 +334,74 @@ namespace Nonogram_Infinity
 
             return currentState;
         }
+
+        public static State OtherDelta(State currentState, bool value, ref Stack<bool> currentStack)
+        {
+            if (currentState == State.COUNTING_BLACK_RUNS && currentStack.Count == 0 && value)
+            {
+                currentState = State.RULE_BROKEN;
+            }
+            else if (currentState == State.COUNTING_WHITE_RUNS && currentStack.Count == 0 && !value)
+            {
+                currentState = State.COUNTING_WHITE_RUNS;
+            }
+            else if (currentState == State.COUNTING_WHITE_RUNS && currentStack.Count == 0 && value)
+            {
+                currentState = State.RULE_BROKEN;
+            }
+            else if (currentState == State.INITIAL_STATE && value == currentStack.Peek() && value)
+            {
+                currentState = State.COUNTING_BLACK_RUNS;
+
+                currentStack.Pop();
+            }
+            else if (currentState == State.INITIAL_STATE && value == currentStack.Peek() && !value)
+            {
+                currentState = State.COUNTING_WHITE_RUNS;
+
+                currentStack.Pop();
+            }
+            else if (currentState == State.INITIAL_STATE && value != currentStack.Peek() && value)
+            {
+                currentState = State.RULE_BROKEN;
+            }
+            else if (currentState == State.COUNTING_BLACK_RUNS && value == currentStack.Peek() && value)
+            {
+                currentState = State.COUNTING_BLACK_RUNS;
+
+                currentStack.Pop();
+            }
+            else if (currentState == State.COUNTING_WHITE_RUNS && value == currentStack.Peek() && !value)
+            {
+                currentState = State.COUNTING_WHITE_RUNS;
+            }
+            else if (currentState == State.COUNTING_BLACK_RUNS && value == currentStack.Peek() && !value)
+            {
+                currentState = State.COUNTING_WHITE_RUNS;
+
+                currentStack.Pop();
+            }
+            else if (currentState == State.COUNTING_BLACK_RUNS && value != currentStack.Peek() && value)
+            {
+                currentState = State.RULE_BROKEN;
+
+                currentStack.Pop();
+            }
+            else if (currentState == State.COUNTING_BLACK_RUNS && value != currentStack.Peek() && !value)
+            {
+                currentState = State.COUNTING_WHITE_RUNS;
+
+                currentStack.Pop();
+            }
+            else if (currentState == State.COUNTING_WHITE_RUNS && value == currentStack.Peek() && value)
+            {
+                currentState = State.COUNTING_BLACK_RUNS;
+
+                currentStack.Pop();
+            }
+
+            return currentState;
+        }
     }
 
     enum State
@@ -335,6 +409,8 @@ namespace Nonogram_Infinity
         NO_BLACK_SQAURES_ENCOUNTERED,
         INITIAL_STATE,
         COUNTING_RUNS,
-        RULE_BROKEN
+        RULE_BROKEN,
+        COUNTING_BLACK_RUNS,
+        COUNTING_WHITE_RUNS
     }
 }
