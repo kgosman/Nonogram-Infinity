@@ -341,6 +341,10 @@ namespace Nonogram_Infinity
             {
                 currentState = State.RULE_BROKEN;
             }
+            else if (currentState == State.COUNTING_BLACK_RUNS && currentStack.Count == 0 && !value)
+            {
+                currentState = State.COUNTING_WHITE_RUNS;
+            }
             else if (currentState == State.COUNTING_WHITE_RUNS && currentStack.Count == 0 && !value)
             {
                 currentState = State.COUNTING_WHITE_RUNS;
