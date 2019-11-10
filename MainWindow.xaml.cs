@@ -29,7 +29,7 @@ namespace Nonogram_Infinity
 
             ReadFile grid = new ReadFile
             {
-                filepath = di.FullName + "\\Data\\Circle.txt"
+                filepath = di.FullName + "\\Data\\Test.txt"
             };
             grid.MakeConstraints();
 
@@ -40,13 +40,15 @@ namespace Nonogram_Infinity
 
             LabelColumns(xSpace, grid.colConstraints, grid.numColumns);
             LabelRows(ySpace, grid.rowConstraints, grid.numRows);
-            runGA(grid, population,population2);
+            RunGA(grid, population,population2);
 
         }
 
-        public async void runGA(ReadFile grid, Population population1, Population population2)
+        public async void RunGA(ReadFile grid, Population population1, Population population2)
         {
-            for(int i = 0; i < 1000; i++)
+            int prevFitnessWoc = -1,genCount = 1;
+            do
+            //for(int i = 0; i < 5000; i++)
             {
                 await Task.Delay(1);
                 population1.ConsultExperts(population2);
@@ -54,22 +56,44 @@ namespace Nonogram_Infinity
                 double xSpace = myRowCanvas.Width / grid.numColumns;
                 double ySpace = myRowCanvas.Height / grid.numRows;
 
-                DrawColBoard(grid, population1.members[0], xSpace, ySpace);
-                DrawRowBoard(grid, population2.members[0], xSpace, ySpace);
+                double avg = 0;
+                foreach (Member member in population1.members)
+                {
+                    avg += member.Fitness;
+                }
+                avg /= population1.members.Count;
+                DrawColBoard(grid, population1.members[0], xSpace, ySpace, avg, genCount);
+                avg = 0;
+                foreach (Member member in population2.members)
+                {
+                    avg += member.Fitness;
+                }
+                avg /= population2.members.Count;
+                DrawRowBoard(grid, population2.members[0], xSpace, ySpace, avg);
 
-                xSpace = wocCanvas.Width / grid.numColumns;
-                ySpace = wocCanvas.Height / grid.numRows;
-
-                DrawWoC(grid, population1.solution, xSpace, ySpace);
+                if (population1.solution.Fitness < prevFitnessWoc || prevFitnessWoc == -1)
+                {
+                    xSpace = wocCanvas.Width / grid.numColumns;
+                    ySpace = wocCanvas.Height / grid.numRows;
+                    prevFitnessWoc = population1.solution.Fitness;
+                    DrawWoC(grid, population1.solution, xSpace, ySpace);
+                }
                 population1.BreedPopulaton(true);
                 population2.BreedPopulaton(true);
-            }
+
+                genCount++;
+            } while (population1.solution.Fitness != 0);
         }
-        public void DrawColBoard(ReadFile grid, Member member, double xSpace, double ySpace)
+        public void DrawColBoard(ReadFile grid, Member member, double xSpace, double ySpace, double avg, int genCount)
         {
             myColCanvas.Children.Clear();
-
-            for(int j = 0; j < grid.numRows; j++)
+            TextBlock textBlock = new TextBlock();
+            Canvas.SetLeft(textBlock, 400);
+            Canvas.SetTop(textBlock, 30);
+            textBlock.Text = "Currently on Generation " + genCount.ToString();
+            myColCanvas.Children.Add(textBlock);
+    
+            for (int j = 0; j < grid.numRows; j++)
             {
                 for (int i = 0; i < grid.numColumns; i++)
                 {
@@ -96,8 +120,13 @@ namespace Nonogram_Infinity
             Canvas.SetLeft(text, 400);
             text.Text = "Best Column Fitness = " + member.Fitness.ToString();
             myColCanvas.Children.Add(text);
+            TextBlock text2 = new TextBlock();
+            Canvas.SetLeft(text2, 400);
+            Canvas.SetTop(text2, 15);
+            text2.Text = "Average Column Fitness = " + avg.ToString();
+            myColCanvas.Children.Add(text2);
         }
-        public void DrawRowBoard(ReadFile grid, Member member, double xSpace, double ySpace)
+        public void DrawRowBoard(ReadFile grid, Member member, double xSpace, double ySpace, double avg)
         {
             myRowCanvas.Children.Clear();
                                    
@@ -128,6 +157,11 @@ namespace Nonogram_Infinity
             Canvas.SetLeft(text, 400);
             text.Text = "Best Row Fitness = " + member.Fitness.ToString();
             myRowCanvas.Children.Add(text);
+            TextBlock text2 = new TextBlock();
+            Canvas.SetLeft(text2, 400);
+            Canvas.SetTop(text2, 15);
+            text2.Text = "Average Row Fitness = " + avg.ToString();
+            myRowCanvas.Children.Add(text2);
         }
         public void DrawWoC(ReadFile grid, Member member,double xSpace, double ySpace)
         {
