@@ -52,7 +52,7 @@ namespace Nonogram_Infinity
                 k = tmp % Column;
                 DNA[l, k] = true;
             }
-            FindFitness(RowRules, ColumnRules);
+            FindFitness(RowRules, ColumnRules,true);
         }
 
         public Member(int Row, int Column, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA)
@@ -65,7 +65,7 @@ namespace Nonogram_Infinity
 
             this.DNA = DNA;
 
-            FindFitness(RowRules, ColumnRules);
+            FindFitness(RowRules, ColumnRules, true);
         }
 
         /// <summary>
@@ -80,10 +80,13 @@ namespace Nonogram_Infinity
         /// </summary>
         /// <param name="RowRules"></param>
         /// <param name="ColumnRules"></param>
-        public void FindFitness(List<int>[] RowRules, List<int>[] ColumnRules) //Will todo
+        public void FindFitness(List<int>[] RowRules, List<int>[] ColumnRules, bool row) //Will todo
         {
-            RowWiseFitness(RowRules);
-            ColumnWiseFitness(ColumnRules);
+            //if(row)
+            Fitness = 0;
+                RowWiseFitness(RowRules);
+           // else
+                ColumnWiseFitness(ColumnRules);
 
             foreach (int fitness in RowFitness)
                 Fitness += fitness;
@@ -337,6 +340,10 @@ namespace Nonogram_Infinity
 
         public static State OtherDelta(State currentState, bool value, ref Stack<bool> currentStack)
         {
+            if (currentState == State.COUNTING_BLACK_RUNS && currentStack.Count == 0 && !value)
+            {
+                currentState = State.COUNTING_WHITE_RUNS;
+            }
             if (currentState == State.COUNTING_BLACK_RUNS && currentStack.Count == 0 && value)
             {
                 currentState = State.RULE_BROKEN;
