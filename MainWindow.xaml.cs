@@ -29,7 +29,7 @@ namespace Nonogram_Infinity
 
             ReadFile grid = new ReadFile
             {
-                filepath = di.FullName + "\\Data\\Test.txt"
+                filepath = di.FullName + "\\Data\\Circle.txt"
             };
             grid.MakeConstraints();
 
@@ -88,8 +88,9 @@ namespace Nonogram_Infinity
         {
             myColCanvas.Children.Clear();
             TextBlock textBlock = new TextBlock();
+            textBlock.FontSize = 17;
             Canvas.SetLeft(textBlock, 400);
-            Canvas.SetTop(textBlock, 30);
+            Canvas.SetTop(textBlock, -20);
             textBlock.Text = "Currently on Generation " + genCount.ToString();
             myColCanvas.Children.Add(textBlock);
     
@@ -117,13 +118,15 @@ namespace Nonogram_Infinity
                 }
             }
             TextBlock text = new TextBlock();
+            text.FontSize = 17;
             Canvas.SetLeft(text, 400);
             text.Text = "Best Column Fitness = " + member.Fitness.ToString();
             myColCanvas.Children.Add(text);
             TextBlock text2 = new TextBlock();
+            text2.FontSize = 17;
             Canvas.SetLeft(text2, 400);
-            Canvas.SetTop(text2, 15);
-            text2.Text = "Average Column Fitness = " + avg.ToString();
+            Canvas.SetTop(text2, 20);
+            text2.Text = "Avg Column Fitness = " + avg.ToString();
             myColCanvas.Children.Add(text2);
         }
         public void DrawRowBoard(ReadFile grid, Member member, double xSpace, double ySpace, double avg)
@@ -154,13 +157,15 @@ namespace Nonogram_Infinity
                 }
             }
             TextBlock text = new TextBlock();
+            text.FontSize = 17;
             Canvas.SetLeft(text, 400);
             text.Text = "Best Row Fitness = " + member.Fitness.ToString();
             myRowCanvas.Children.Add(text);
             TextBlock text2 = new TextBlock();
+            text2.FontSize = 17;
             Canvas.SetLeft(text2, 400);
-            Canvas.SetTop(text2, 15);
-            text2.Text = "Average Row Fitness = " + avg.ToString();
+            Canvas.SetTop(text2, 20);
+            text2.Text = "Avg Row Fitness = " + avg.ToString();
             myRowCanvas.Children.Add(text2);
         }
         public void DrawWoC(ReadFile grid, Member member,double xSpace, double ySpace)
@@ -191,6 +196,7 @@ namespace Nonogram_Infinity
                 }
             }
             TextBlock text = new TextBlock();
+            text.FontSize = 17;
             Canvas.SetTop(text, 600);
             text.Text = "Wisdom of Crowds Fitness = " + member.Fitness.ToString();
             wocCanvas.Children.Add(text);
