@@ -1,0 +1,22 @@
+Dimension Row: 5
+Row Constraints
+{0}
+{1,1}
+{1}
+{1,1}
+{0}
+Dimension Col: 5
+Column Constraints
+{0}
+{1,1}
+{1}
+{1,1}
+{0}
+Solution:
+0,0,0,0,0
+0,1,0,1,0
+0,0,1,0,0
+0,1,0,1,0
+0,0,0,0,0
+
+
