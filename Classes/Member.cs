@@ -76,7 +76,7 @@ namespace Nonogram_Infinity
 
                 DNA[l, k] = true;
             }
-            FindFitness(RowRules, ColumnRules,true);
+            FindFitness(RowRules, ColumnRules);
         }
         public Member(int Row, int Column, List<int>[] RowRules, List<int>[] ColumnRules, int[,] helper, bool type)
         {
@@ -170,7 +170,7 @@ namespace Nonogram_Infinity
 
             this.DNA = DNA;
 
-            FindFitness(RowRules, ColumnRules, true);
+            FindFitness(RowRules, ColumnRules);
         }
 
         /// <summary>
@@ -185,13 +185,11 @@ namespace Nonogram_Infinity
         /// </summary>
         /// <param name="RowRules"></param>
         /// <param name="ColumnRules"></param>
-        public void FindFitness(List<int>[] RowRules, List<int>[] ColumnRules, bool row) //Will todo
+        public void FindFitness(List<int>[] RowRules, List<int>[] ColumnRules) //Will todo
         {
-            //if(row)
-            Fitness = 0;
-                RowWiseFitness(RowRules);
-           // else
-                ColumnWiseFitness(ColumnRules);
+           Fitness = 0;
+           RowWiseFitness(RowRules);
+           ColumnWiseFitness(ColumnRules);
 
             foreach (int fitness in RowFitness)
                 Fitness += fitness;
@@ -318,6 +316,20 @@ namespace Nonogram_Infinity
         {
             if (rowWise)
             {
+                
+                int nonZeroCount = 0;
+                for(int i = 0; i < RowFitness.Length; i++)
+                {
+                    if(RowFitness[i] > 0)
+                    {
+                        nonZeroCount++;
+                    }
+                }
+                if(nonZeroCount < 2)
+                {
+                    return;
+                }
+
                 int row1Index = 0, row2Index = 1;
 
                 bool row1Okay = false, row2Okay = false;
@@ -355,6 +367,14 @@ namespace Nonogram_Infinity
 
             if (columnWise)
             {
+                int nonZeroCount = 0;
+                for (int i = 0; i < ColumnFitness.Length; i++)
+                {
+                    if (ColumnFitness[i] > 0)
+                    {
+                        nonZeroCount++;
+                    }
+                }
                 int col1Index = 0, col2Index = 1;
 
                 bool col1Okay = false, col2Okay = false;

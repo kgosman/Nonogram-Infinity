@@ -495,10 +495,10 @@ namespace Nonogram_Infinity
             }
             foreach(Member child in offspring)
             {
-                child.FindFitness(rowConstraints, colConstraints,rowWise);
+                child.FindFitness(rowConstraints, colConstraints);
                 members.Add(child);
             }
-            //MutatePopulation(elitePreservation);
+            MutatePopulation(elitePreservation);
             members = members.OrderBy(member => member.Fitness).ToList();
         }
         //Mutate bottom 90% of population if elitePreservation is true
@@ -586,7 +586,7 @@ namespace Nonogram_Infinity
                 solution.DNA[expert.i, expert.j] = true;
                 blackCount++;
             }
-            solution.FindFitness(rowConstraints,colConstraints,false);
+            solution.FindFitness(rowConstraints,colConstraints);
         }
     }
 }
