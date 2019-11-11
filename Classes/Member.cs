@@ -440,7 +440,6 @@ namespace Nonogram_Infinity
                         DNA[i, k] = false;
                     }
 
-                    //starting = new List<int>[Row];
                     rule_count = 0;
                     square_count = 0;
                     start = 0;
@@ -471,7 +470,7 @@ namespace Nonogram_Infinity
                 for (i = 0; i < Column; i++)
                 {
                     int colChance = RandomHolder.Instance.Next(0, 10);
-                    if (colChance >= 5 || RowRules[i].Contains(0))
+                    if (colChance >= 5 || ColumnRules[i].Contains(0))
                     {
                         continue;
                     }
@@ -480,7 +479,6 @@ namespace Nonogram_Infinity
                         DNA[i, k] = false;
                     }
 
-                    //starting = new List<int>[Column];
                     rule_count = 0;
                     square_count = 0;
                     start = 0;

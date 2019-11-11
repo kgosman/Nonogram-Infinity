@@ -171,6 +171,7 @@ namespace Nonogram_Infinity
                         offspring.starting[i].Add(start);
                         for (j = 0; j < rule; j++)
                         {
+                            //offspring.DNA[i, j + start] = true;
                             offspring.DNA[j + start, i] = true;
                         }
                         k++;
@@ -546,7 +547,7 @@ namespace Nonogram_Infinity
                 int rng = RandomHolder.Instance.Next(0, 10);
                 if(elitePreservation == true)
                 {
-                    if (j > members.Count / 10 && rng < 8)
+                    if (j > members.Count / 50 && rng < 8)
                     {
                         members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
                         members[i].FindFitness(rowConstraints, colConstraints);
@@ -555,12 +556,11 @@ namespace Nonogram_Infinity
                 }
                 else
                 {
-                    if (j > members.Count && rng < 8)
+                    if (rng < 8)
                     {
                         members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
                         members[i].FindFitness(rowConstraints, colConstraints);
-                    }
-                    j++;
+                    }                
                 }
                 
             }
@@ -583,15 +583,15 @@ namespace Nonogram_Infinity
         {
             int[,] agreement = new int[row,col];
             int count = 0;
-            foreach(Member member in members)
+            foreach (Member member in members)
             {
-                if (count == members.Count*.5)
+                if (count == members.Count * .10)
                     break;
-                for(int i = 0; i < row; i++)
+                for (int i = 0; i < row; i++)
                 {
-                    for(int j = 0; j < col; j++)
+                    for (int j = 0; j < col; j++)
                     {
-                        if(member.DNA[i,j] == true)
+                        if (member.DNA[i, j] == true)
                         {
                             agreement[i, j] += 1;
                         }
@@ -602,7 +602,7 @@ namespace Nonogram_Infinity
             count = 0;
             foreach (Member member in population.members)
             {
-                if (count == population.members.Count*.5)
+                if (count == population.members.Count*.10)
                     break;
                 for (int i = 0; i < row; i++)
                 {
