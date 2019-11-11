@@ -141,8 +141,44 @@ namespace Nonogram_Infinity
         }
         public Member Breed2(Member mother, Member father)
         {
-
-            return new Member(row, col, true);
+            int i, j, k, start;
+            Member offspring = new Member(row, col, rowWise);
+            if(rowWise)
+            {
+                for(i = 0; i < row; i++)
+                {
+                    k = 0;
+                    foreach(int rule in rowConstraints[i])
+                    {
+                        start = (mother.starting[i][k] + father.starting[i][k])/2;
+                        offspring.starting[i].Add(start);
+                        for(j = 0; j < rule; j++)
+                        {
+                            offspring.DNA[i, j + start] = true;
+                        }
+                       k++;
+                    }
+                }
+            }
+            else
+            {
+                for (i = 0; i < col; i++)
+                {
+                    k = 0;
+                    foreach (int rule in colConstraints[i])
+                    {
+                        start = (mother.starting[i][k] + father.starting[i][k]) / 2;
+                        offspring.starting[i].Add(start);
+                        for (j = 0; j < rule; j++)
+                        {
+                            //offspring.DNA[i, j + start] = true;
+                            offspring.DNA[j + start, i] = true;
+                        }
+                        k++;
+                    }
+                }
+            }
+            return offspring;
         }
 
         //Breeding with 2 splice points chosen at random
@@ -484,8 +520,9 @@ namespace Nonogram_Infinity
             int j = 0;
             for(int i = 0; i < members.Count / 4; i++)
             {
-                offspring.Add(Breed(members[j], members[j + 1]));
-                offspring.Add(BreedReverse(members[j], members[j + 1]));
+                offspring.Add(Breed2(members[j], members[j + 1]));
+                //offspring.Add(Breed(members[j], members[j + 1]));
+                //offspring.Add(BreedReverse(members[j], members[j + 1]));
                 j += 2;
             }
 
@@ -495,10 +532,10 @@ namespace Nonogram_Infinity
             }
             foreach(Member child in offspring)
             {
-                child.FindFitness(rowConstraints, colConstraints,rowWise);
+                child.FindFitness(rowConstraints, colConstraints);
                 members.Add(child);
             }
-            //MutatePopulation(elitePreservation);
+            MutatePopulation(elitePreservation);
             members = members.OrderBy(member => member.Fitness).ToList();
         }
         //Mutate bottom 90% of population if elitePreservation is true
@@ -507,11 +544,25 @@ namespace Nonogram_Infinity
             int j = 0;
             for (int i = 0; i < members.Count; i++)
             {
-                if(j > members.Count / 10 && elitePreservation == true)
+                int rng = RandomHolder.Instance.Next(0, 10);
+                if(elitePreservation == true)
                 {
-                    members[i].Mutate(rowWise, columnWise);
+                    if (j > members.Count / 50 && rng < 5)
+                    {
+                        members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
+                        members[i].FindFitness(rowConstraints, colConstraints);
+                    }
+                    j++;
                 }
-                j++;
+                else
+                {
+                    if (rng < 5)
+                    {
+                        members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
+                        members[i].FindFitness(rowConstraints, colConstraints);
+                    }                
+                }
+                
             }
         }
 
@@ -532,15 +583,15 @@ namespace Nonogram_Infinity
         {
             int[,] agreement = new int[row,col];
             int count = 0;
-            foreach(Member member in members)
+            foreach (Member member in members)
             {
-                if (count == members.Count*.25)
+                if (count == members.Count * .10)
                     break;
-                for(int i = 0; i < row; i++)
+                for (int i = 0; i < row; i++)
                 {
-                    for(int j = 0; j < col; j++)
+                    for (int j = 0; j < col; j++)
                     {
-                        if(member.DNA[i,j] == true)
+                        if (member.DNA[i, j] == true)
                         {
                             agreement[i, j] += 1;
                         }
@@ -551,7 +602,7 @@ namespace Nonogram_Infinity
             count = 0;
             foreach (Member member in population.members)
             {
-                if (count == population.members.Count*.25)
+                if (count == population.members.Count*.10)
                     break;
                 for (int i = 0; i < row; i++)
                 {
@@ -576,17 +627,15 @@ namespace Nonogram_Infinity
             }
             
             experts = experts.OrderByDescending(expert => expert.weight).ToList();
-            int blackCount = 0;
-            foreach(Expert expert in experts)
+            int blackCount = 0, index = 0;
+            while(index < experts.Count)
             {
-                if(blackCount == black_squares)
-                {
+                if (blackCount == black_squares)
                     break;
-                }
-                solution.DNA[expert.i, expert.j] = true;
-                blackCount++;
+
             }
-            solution.FindFitness(rowConstraints,colConstraints,false);
+            while(blackCount < black_squares)
+            solution.FindFitness(rowConstraints,colConstraints);
         }
     }
 }
