@@ -157,7 +157,7 @@ namespace Nonogram_Infinity
                 }
             }
 
-            FindFitness(RowRules, ColumnRules, true);
+            FindFitness(RowRules, ColumnRules);
         }
 
         public Member(int Row, int Column, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA)
@@ -375,6 +375,10 @@ namespace Nonogram_Infinity
                         nonZeroCount++;
                     }
                 }
+                if (nonZeroCount < 2)
+                {
+                    return;
+                }
                 int col1Index = 0, col2Index = 1;
 
                 bool col1Okay = false, col2Okay = false;
@@ -407,6 +411,91 @@ namespace Nonogram_Infinity
                 {
                     DNA[i, col1Index] = col2[i];
                     DNA[i, col2Index] = col1[i];
+                }
+            }
+        }
+
+        internal void MutateStartingPositions(bool rowWise, List<int>[] RowRules, List<int>[] ColumnRules)
+        {
+            int i, j, rule_count, square_count, rng, start;
+            if (rowWise)
+            {
+                for (i = 0; i < Row; i++)
+                {
+                    int rowChance = RandomHolder.Instance.Next(0,10);
+                    if(rowChance >= 5 || RowRules[i].Contains(0))
+                    {
+                        continue;
+                    }
+                    for (int k = 0; k < Column; k++)
+                    {
+                        DNA[i, k] = false;
+                    }
+
+                    //starting = new List<int>[Row];
+                    rule_count = 0;
+                    square_count = 0;
+                    start = 0;
+                    foreach (int rule in RowRules[i])
+                    {
+                        starting[i] = new List<int>();
+                        square_count += rule;
+                        rule_count++;
+                    }
+                    foreach (int rule in RowRules[i])
+                    {
+
+                        rule_count--;
+                        rng = RandomHolder.Instance.Next(start, Column - (rule_count + square_count));
+
+                        for (j = 0; j < rule; j++)
+                        {
+                            DNA[i, j + rng] = true;
+                        }
+                        start = (rng + rule + 1);
+                        square_count -= rule;
+                        starting[i].Add(rng);
+                    }
+                }
+            }
+            else
+            {
+                for (i = 0; i < Column; i++)
+                {
+                    int colChance = RandomHolder.Instance.Next(0, 10);
+                    if (colChance >= 5 || RowRules[i].Contains(0))
+                    {
+                        continue;
+                    }
+                    for(int k = 0; k < Column; k++)
+                    {
+                        DNA[i, k] = false;
+                    }
+
+                    //starting = new List<int>[Column];
+                    rule_count = 0;
+                    square_count = 0;
+                    start = 0;
+                    foreach (int rule in ColumnRules[i])
+                    {
+                        starting[i] = new List<int>();
+                        square_count += rule;
+                        rule_count++;
+                    }
+                    foreach (int rule in ColumnRules[i])
+                    {
+
+                        rule_count--;
+                        rng = RandomHolder.Instance.Next(start, Row - (rule_count + square_count));
+
+                        for (j = 0; j < rule; j++)
+                        {
+                            DNA[j + rng, i] = true;
+                        }
+                        start = (rng + rule + 1);
+                        square_count -= rule;
+                        starting[i].Add(rng);
+                    }
                 }
             }
         }
