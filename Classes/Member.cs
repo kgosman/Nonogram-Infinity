@@ -24,10 +24,18 @@ namespace Nonogram_Infinity
             if(type)
             {
                 starting = new List<int>[Row];
+                for(int i = 0; i < row; i++)
+                {
+                    starting[i] = new List<int>();
+                }
             }
             else
             {
                 starting = new List<int>[Column];
+                for (int i = 0; i < col; i++)
+                {
+                    starting[i] = new List<int>();
+                }
             }
 
         }

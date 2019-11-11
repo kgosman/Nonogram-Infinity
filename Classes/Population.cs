@@ -141,8 +141,43 @@ namespace Nonogram_Infinity
         }
         public Member Breed2(Member mother, Member father)
         {
-
-            return new Member(row, col, true);
+            int i, j, k, start;
+            Member offspring = new Member(row, col, rowWise);
+            if(rowWise)
+            {
+                for(i = 0; i < row; i++)
+                {
+                    k = 0;
+                    foreach(int rule in rowConstraints[i])
+                    {
+                        start = (mother.starting[i][k] + father.starting[i][k])/2;
+                        offspring.starting[i].Add(start);
+                        for(j = 0; j < rule; j++)
+                        {
+                            offspring.DNA[i, j + start] = true;
+                        }
+                       k++;
+                    }
+                }
+            }
+            else
+            {
+                for (i = 0; i < col; i++)
+                {
+                    k = 0;
+                    foreach (int rule in colConstraints[i])
+                    {
+                        start = (mother.starting[i][k] + father.starting[i][k]) / 2;
+                        offspring.starting[i].Add(start);
+                        for (j = 0; j < rule; j++)
+                        {
+                            offspring.DNA[j + start, i] = true;
+                        }
+                        k++;
+                    }
+                }
+            }
+            return offspring;
         }
 
         //Breeding with 2 splice points chosen at random
@@ -484,8 +519,9 @@ namespace Nonogram_Infinity
             int j = 0;
             for(int i = 0; i < members.Count / 4; i++)
             {
-                offspring.Add(Breed(members[j], members[j + 1]));
-                offspring.Add(BreedReverse(members[j], members[j + 1]));
+                offspring.Add(Breed2(members[j], members[j + 1]));
+                //offspring.Add(Breed(members[j], members[j + 1]));
+                //offspring.Add(BreedReverse(members[j], members[j + 1]));
                 j += 2;
             }
 

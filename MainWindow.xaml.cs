@@ -41,9 +41,11 @@ namespace Nonogram_Infinity
 
             Population population = new Population(grid.colConstraints, grid.rowConstraints, false);
             Population population2 = new Population(grid.colConstraints, grid.rowConstraints, true);
+            
             RunGA(grid, population,population2);
-            //DrawColBoard(grid, population.members[0], xSpace, ySpace, 0, 0);
-            //DrawRowBoard(grid, population2.members[0], xSpace, ySpace, 0);
+            //DrawColBoard(grid, population2.members[0], xSpace, ySpace, 0, 0);
+            //DrawRowBoard(grid, population2.members[1], xSpace, ySpace, 0);
+            //DrawWoC(grid, population2.Breed2(population2.members[0], population2.members[1]), xSpace, ySpace);
 
         }
 
