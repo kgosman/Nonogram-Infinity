@@ -29,7 +29,7 @@ namespace Nonogram_Infinity
 
             ReadFile grid = new ReadFile
             {
-                filepath = di.FullName + "\\Data\\Circle.txt"
+                filepath = di.FullName + "\\Data\\Crown2.txt"
             };
             grid.MakeConstraints();
 

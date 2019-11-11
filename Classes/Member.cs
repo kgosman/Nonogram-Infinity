@@ -476,7 +476,7 @@ namespace Nonogram_Infinity
                     }
                     for(int k = 0; k < Column; k++)
                     {
-                        DNA[i, k] = false;
+                        DNA[k, i] = false;
                     }
 
                     rule_count = 0;
