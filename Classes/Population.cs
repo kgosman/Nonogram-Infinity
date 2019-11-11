@@ -543,11 +543,26 @@ namespace Nonogram_Infinity
             int j = 0;
             for (int i = 0; i < members.Count; i++)
             {
-                if(j > members.Count / 10 && elitePreservation == true)
+                int rng = RandomHolder.Instance.Next(0, 10);
+                if(elitePreservation == true)
                 {
-                    members[i].Mutate(rowWise, columnWise);
+                    if (j > members.Count / 10 && rng < 8)
+                    {
+                        members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
+                        members[i].FindFitness(rowConstraints, colConstraints);
+                    }
+                    j++;
                 }
-                j++;
+                else
+                {
+                    if (j > members.Count && rng < 8)
+                    {
+                        members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
+                        members[i].FindFitness(rowConstraints, colConstraints);
+                    }
+                    j++;
+                }
+                
             }
         }
 
@@ -570,7 +585,7 @@ namespace Nonogram_Infinity
             int count = 0;
             foreach(Member member in members)
             {
-                if (count == members.Count*.25)
+                if (count == members.Count*.5)
                     break;
                 for(int i = 0; i < row; i++)
                 {
@@ -587,7 +602,7 @@ namespace Nonogram_Infinity
             count = 0;
             foreach (Member member in population.members)
             {
-                if (count == population.members.Count*.25)
+                if (count == population.members.Count*.5)
                     break;
                 for (int i = 0; i < row; i++)
                 {
