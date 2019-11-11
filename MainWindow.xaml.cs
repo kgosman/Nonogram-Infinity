@@ -26,12 +26,18 @@ namespace Nonogram_Infinity
             InitializeComponent();
             DirectoryInfo di = new DirectoryInfo(Directory.GetCurrentDirectory());
             di = (di.Parent).Parent;
-
+            string picross = "Crown2";
             ReadFile grid = new ReadFile
             {
-                filepath = di.FullName + "\\Data\\Lizard.txt"
+                filepath = di.FullName + "\\Data\\" + picross + ".txt"
             };
             grid.MakeConstraints();
+
+            WriteFile outfile = new WriteFile
+            {
+                outFilePath = di.FullName + "\\Data\\" + picross + ".csv"
+            };
+            outfile.WriteHeaders();
 
             double xSpace = myRowCanvas.Width / grid.numColumns;
             double ySpace = myRowCanvas.Height / grid.numRows;
@@ -42,14 +48,14 @@ namespace Nonogram_Infinity
             Population population = new Population(grid.colConstraints, grid.rowConstraints, false);
             Population population2 = new Population(grid.colConstraints, grid.rowConstraints, true);
             
-            RunGA(grid, population,population2);
+            RunGA(grid, population,population2, outfile);
             //DrawColBoard(grid, population2.members[0], xSpace, ySpace, 0, 0);
             //DrawRowBoard(grid, population2.members[1], xSpace, ySpace, 0);
             //DrawWoC(grid, population2.Breed2(population2.members[0], population2.members[1]), xSpace, ySpace);
 
         }
 
-        public async void RunGA(ReadFile grid, Population population1, Population population2)
+        public async void RunGA(ReadFile grid, Population population1, Population population2, WriteFile outfile)
         {
             int prevFitnessWoc = -1,genCount = 1;
             do
@@ -61,20 +67,20 @@ namespace Nonogram_Infinity
                 double xSpace = myRowCanvas.Width / grid.numColumns;
                 double ySpace = myRowCanvas.Height / grid.numRows;
 
-                double avg = 0;
+                double avg1 = 0;
                 foreach (Member member in population1.members)
                 {
-                    avg += member.Fitness;
+                    avg1 += member.Fitness;
                 }
-                avg /= population1.members.Count;
-                DrawColBoard(grid, population1.members[0], xSpace, ySpace, avg, genCount,population1.members[population1.members.Count-1]);
-                avg = 0;
+                avg1 /= population1.members.Count;
+                DrawColBoard(grid, population1.members[0], xSpace, ySpace, avg1, genCount,population1.members[population1.members.Count-1]);
+                double avg2 = 0;
                 foreach (Member member in population2.members)
                 {
-                    avg += member.Fitness;
+                    avg2 += member.Fitness;
                 }
-                avg /= population2.members.Count;
-                DrawRowBoard(grid, population2.members[0], xSpace, ySpace, avg, population2.members[population2.members.Count - 1]);
+                avg2 /= population2.members.Count;
+                DrawRowBoard(grid, population2.members[0], xSpace, ySpace, avg2, population2.members[population2.members.Count - 1]);
 
                 if (population1.solution.Fitness < prevFitnessWoc || prevFitnessWoc == -1)
                 {
@@ -83,6 +89,7 @@ namespace Nonogram_Infinity
                     prevFitnessWoc = population1.solution.Fitness;
                     DrawWoC(grid, population1.solution, xSpace, ySpace);
                 }
+                outfile.WriteToFile(genCount, population1, population2, avg1, avg2);
                 population1.BreedPopulaton(true);
                 population2.BreedPopulaton(true);
 
