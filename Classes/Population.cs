@@ -22,6 +22,8 @@ namespace Nonogram_Infinity
         private List<int>[] rowConstraints;
         private List<int>[] colConstraintsR;
         private List<int>[] rowConstraintsR;
+        private int[] rowRuleCount;
+        private int[] colRuleCount;
         private bool rowWise;
         private bool columnWise;
 
@@ -35,8 +37,11 @@ namespace Nonogram_Infinity
             this.rowConstraintsR = rConst;
             this.colConstraintsR.Reverse();
             this.rowConstraintsR.Reverse();
+            
             this.row = rowConstraints.Length;
             this.col = colConstraints.Length;
+            this.rowRuleCount = new int[row];
+            this.colRuleCount = new int[col];
             this.helper = new int[row, col];
             this.rowWise = type;
             this.columnWise = !type;
@@ -57,6 +62,24 @@ namespace Nonogram_Infinity
             }
             this.members = new List<Member>(100);
 
+            for(i = 0; i < row; i++)
+            {
+                rowRuleCount[i] = 0;
+                foreach (int rule in rowConstraints[i])
+                {
+                    rowRuleCount[i] += rule;
+                }
+            }
+            for (i = 0; i < col; i++)
+            {
+                colRuleCount[i] = 0;
+                foreach (int rule in colConstraints[i])
+                {
+                    rowRuleCount[i] += rule;
+                }
+            }
+
+            /*
             for(i = 0; i < row; i++)
             {
                 j = 0;
@@ -120,7 +143,7 @@ namespace Nonogram_Infinity
                     }
                 }
             }
-
+            */
             for (i = 0; i < 100; i++)
             {
                 //members.Add(new Member(row, col, black_squares, rowConstraints, colConstraints, helper));
@@ -627,15 +650,51 @@ namespace Nonogram_Infinity
             }
             
             experts = experts.OrderByDescending(expert => expert.weight).ToList();
-            int blackCount = 0;
-            foreach(Expert expert in experts)
+            int blackCount = 0, index = 0;
+            bool rule_break = true;
+            int[] rowCount, colCount;
+            rowCount = new int[row];
+            colCount = new int[col];
+            for(int i = 0; i < row; i++)
             {
+                rowCount[i] = 0;
+            }
+            for (int i = 0; i < col; i++)
+            {
+                colCount[i] = 0;
+            }
+
+            while (index < experts.Count)
+            {
+                rule_break = false;
                 if(blackCount == black_squares)
                 {
                     break;
                 }
-                solution.DNA[expert.i, expert.j] = true;
+
+                if (rowCount[experts[index].i] == rowRuleCount[experts[index].i])
+                    rule_break = true;
+                else if(colCount[experts[index].j] == colRuleCount[experts[index].j])
+                    rule_break = true;
+                if (!rule_break)
+                {
+                    solution.DNA[experts[index].i, experts[index].j] = true;
+                    blackCount++;
+                    rowCount[experts[index].i]++;
+                    colCount[experts[index].j]++;
+                    experts.RemoveAt(index);
+                }
+                else
+                {
+                    index++;
+                }
+            }
+            index = 0;
+            while(blackCount < black_squares)
+            {
+                solution.DNA[experts[index].i, experts[index].j] = true;
                 blackCount++;
+                index++;
             }
             solution.FindFitness(rowConstraints,colConstraints);
         }
