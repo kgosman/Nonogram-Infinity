@@ -547,7 +547,7 @@ namespace Nonogram_Infinity
                 int rng = RandomHolder.Instance.Next(0, 10);
                 if(elitePreservation == true)
                 {
-                    if (j > members.Count / 50 && rng < 8)
+                    if (j > members.Count / 50 && rng < 5)
                     {
                         members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
                         members[i].FindFitness(rowConstraints, colConstraints);
@@ -556,7 +556,7 @@ namespace Nonogram_Infinity
                 }
                 else
                 {
-                    if (rng < 8)
+                    if (rng < 5)
                     {
                         members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
                         members[i].FindFitness(rowConstraints, colConstraints);
