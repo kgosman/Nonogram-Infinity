@@ -165,7 +165,7 @@ namespace Nonogram_Infinity
                 }
             }
 
-            FindFitness(RowRules, ColumnRules, true);
+            FindFitness(RowRules, ColumnRules);
         }
 
         public Member(int Row, int Column, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA)
@@ -382,6 +382,10 @@ namespace Nonogram_Infinity
                     {
                         nonZeroCount++;
                     }
+                }
+                if (nonZeroCount < 2)
+                {
+                    return;
                 }
                 int col1Index = 0, col2Index = 1;
 
