@@ -7,12 +7,13 @@ namespace Nonogram_Infinity
     {
         public int Fitness { get; private set; }
         public bool[,] DNA { get; private set; }
+        public List<int>[] starting;
         private readonly int Row;
         private readonly int Column;
 
         public int[] RowFitness { get; private set; }
         public int[] ColumnFitness { get; private set; }
-        public Member(int row, int col)
+        public Member(int row, int col, bool type)
         {
             Fitness = 0;
             Row = row;
@@ -20,15 +21,23 @@ namespace Nonogram_Infinity
             DNA = new bool[Row, Column];
             RowFitness = new int[Row];
             ColumnFitness = new int[Column];
+            if(type)
+            {
+                starting = new List<int>[Row];
+            }
+            else
+            {
+                starting = new List<int>[Column];
+            }
+
         }
-        public Member (int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules)
+        public Member (int Row, int Column, int BlackSquares, List<int>[] RowRules, List<int>[] ColumnRules, int[,] helper)
         {
             Fitness = 0;
             this.Row = Row;
             this.Column = Column;
             RowFitness = new int[Row];
             ColumnFitness = new int[Column];
-
             DNA = new bool[this.Row, this.Column];
 
             int l, k, rng;
@@ -37,22 +46,118 @@ namespace Nonogram_Infinity
             {
                 for (int j = 0; j < Column; j++)
                 {
-                    DNA[i, j] = false;
+                    if (helper[i, j] == 1)
+                    {
+                        DNA[i, j] = true;
+                        BlackSquares--;
+                    }
+
+                    else
+                        DNA[i, j] = false;
                     array[Column * i + j] = Column * i + j;
                 }
             }
             int tmp;
             for (int i = 0; i < BlackSquares; i++)
             {
-                rng = RandomHolder.Instance.Next(0, Row * Column - i);
-                tmp = array[rng];
-                array[rng] = array[Row * Column - i - 1];
-                array[Row * Column - i - 1] = tmp;
-                l = tmp / Column;
-                k = tmp % Column;
+                while(true)
+                {
+                    rng = RandomHolder.Instance.Next(0, Row * Column - i);
+                    tmp = array[rng];
+                    array[rng] = array[Row * Column - i - 1];
+                    array[Row * Column - i - 1] = tmp;
+                    l = tmp / Column;
+                    k = tmp % Column;
+                    if(helper[l, k] != 2 && !DNA[l,k])
+                    {
+                        break;
+                    }
+                }
+
                 DNA[l, k] = true;
             }
             FindFitness(RowRules, ColumnRules,true);
+        }
+        public Member(int Row, int Column, List<int>[] RowRules, List<int>[] ColumnRules, int[,] helper, bool type)
+        {
+            Fitness = 0;
+            this.Row = Row;
+            this.Column = Column;
+            RowFitness = new int[Row];
+            ColumnFitness = new int[Column];
+            DNA = new bool[this.Row, this.Column];
+            int i, j, rule_count, square_count, rng, start;
+
+            for (i = 0; i < Row; i++)
+            {
+                for (j = 0; j < Column; j++)
+                {
+                    DNA[i, j] = false;
+                }
+            }
+
+            if (type)
+            {
+                starting = new List<int>[Row];
+                for (i = 0; i < Row; i++)
+                {
+                    starting[i] = new List<int>();
+                    rule_count = 0;
+                    square_count = 0;
+                    start = 0;
+                    foreach (int rule in RowRules[i])
+                    {
+                        square_count += rule;
+                        rule_count++;
+                    }
+                    foreach (int rule in RowRules[i])
+                    {
+
+                        rule_count--;
+                        rng = RandomHolder.Instance.Next(start, Column - (rule_count + square_count));
+
+                        for (j = 0; j < rule; j++)
+                        {
+                            DNA[i, j + rng] = true;
+                        }
+                        start = (rng + rule + 1);
+                        square_count -= rule;
+                        starting[i].Add(rng);
+                    }
+                }
+            }
+            else
+            {
+                starting = new List<int>[Column];
+                for (i = 0; i < Column; i++)
+                {
+                    starting[i] = new List<int>();
+                    rule_count = 0;
+                    square_count = 0;
+                    start = 0;
+                    foreach (int rule in ColumnRules[i])
+                    {
+                        square_count += rule;
+                        rule_count++;
+                    }
+                    foreach (int rule in ColumnRules[i])
+                    {
+
+                        rule_count--;
+                        rng = RandomHolder.Instance.Next(start, Row - (rule_count + square_count));
+
+                        for (j = 0; j < rule; j++)
+                        {
+                            DNA[j + rng, i] = true;
+                        }
+                        start = (rng + rule + 1);
+                        square_count -= rule;
+                        starting[i].Add(rng);
+                    }
+                }
+            }
+
+            FindFitness(RowRules, ColumnRules, true);
         }
 
         public Member(int Row, int Column, List<int>[] RowRules, List<int>[] ColumnRules, bool[,] DNA)

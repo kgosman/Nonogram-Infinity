@@ -29,7 +29,7 @@ namespace Nonogram_Infinity
 
             ReadFile grid = new ReadFile
             {
-                filepath = di.FullName + "\\Data\\Circle.txt"
+                filepath = di.FullName + "\\Data\\Lizard.txt"
             };
             grid.MakeConstraints();
 
@@ -41,6 +41,8 @@ namespace Nonogram_Infinity
             LabelColumns(xSpace, grid.colConstraints, grid.numColumns);
             LabelRows(ySpace, grid.rowConstraints, grid.numRows);
             RunGA(grid, population,population2);
+            //DrawColBoard(grid, population.members[0], xSpace, ySpace, 0, 0);
+            //DrawRowBoard(grid, population2.members[0], xSpace, ySpace, 0);
 
         }
 

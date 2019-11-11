@@ -11,7 +11,8 @@ namespace Nonogram_Infinity
     {
 
         public List<Member> members;
-        public double[,] matrix;
+        public int[,] matrix;
+        public int[,] helper; //0: nothing; 1: must be filled; 2: cannot be filled
         public Member solution;
 
         private int row;
@@ -26,6 +27,7 @@ namespace Nonogram_Infinity
 
         public Population(List<int>[] cConst, List<int>[] rConst, bool type)
         {
+
             this.black_squares = 0;
             this.rowConstraints = rConst;
             this.colConstraints = cConst;
@@ -35,27 +37,99 @@ namespace Nonogram_Infinity
             this.rowConstraintsR.Reverse();
             this.row = rowConstraints.Length;
             this.col = colConstraints.Length;
+            this.helper = new int[row, col];
             this.rowWise = type;
             this.columnWise = !type;
-            for(int i = 0; i < row; i++)
+            int i, j, rule_tmp;
+            for (i = 0; i < row; i++)
             {
+                for(j = 0; j < col; j++)
+                {
+                    if (rowConstraints[i][0] == 0 || colConstraints[j][0] == 0)
+                        helper[i, j] = 2;
+                    else
+                        helper[i, j] = 0;
+                }
                 foreach(int a in rowConstraints[i])
                 {
                     black_squares += a;
                 }
             }
             this.members = new List<Member>(100);
-            for(int i = 0; i < 100; i++)
+
+            for(i = 0; i < row; i++)
             {
-                members.Add(new Member(row, col, black_squares, rowConstraints, colConstraints));
+                j = 0;
+                foreach(int rule in rowConstraints[i])
+                {
+                    rule_tmp = rule;
+                    while(rule_tmp > 0)
+                    {
+                        helper[i, j] = 3;
+                        j++;
+                        rule_tmp--;
+                    }
+                }
             }
-            this.solution = new Member(row, col);
+            for (i = 0; i < row; i++)
+            {
+                j = col-1;
+                foreach (int rule in rowConstraintsR[i])
+                {
+                    rule_tmp = rule;
+                    while (rule_tmp > 0)
+                    {
+                        if(helper[i, j] == 3)
+                        {
+                            helper[i, j] = 1;
+                        }
+                        j--;
+                        rule_tmp--;
+                    }
+                }
+            }
+
+
+            for (i = 0; i < col; i++)
+            {
+                j = row-1;
+                foreach (int rule in colConstraintsR[i])
+                {
+                    rule_tmp = rule;
+                    while (rule_tmp > 0)
+                    {
+                        if (helper[j, i] != 1)
+                            helper[j, i] = 4;
+                        j--;
+                        rule_tmp--;
+                    }
+                }
+            }
+            for (i = 0; i < col; i++)
+            {
+                j = 0;
+                foreach (int rule in colConstraints[i])
+                {
+                    rule_tmp = rule;
+                    while (rule_tmp > 0)
+                    {
+                        if (helper[j, i] == 4)
+                            helper[j, i] = 1;
+                        j++;
+                        rule_tmp--;
+                    }
+                }
+            }
+
+            for (i = 0; i < 100; i++)
+            {
+                //members.Add(new Member(row, col, black_squares, rowConstraints, colConstraints, helper));
+                members.Add(new Member(row, col, rowConstraints, colConstraints, helper, type));
+            }
+            this.solution = new Member(row, col, rowWise);
             //this.ConsultExperts();
         }
-        public Member get()
-        {
-            return Breed(members[0], members[1]);
-        }
+
 
         //Clone all members in a population
         public void Clone(Population population)
@@ -65,10 +139,16 @@ namespace Nonogram_Infinity
                 members.Add(member);
             }
         }
+        public Member Breed2(Member mother, Member father)
+        {
+
+            return new Member(row, col, true);
+        }
+
         //Breeding with 2 splice points chosen at random
         public Member Breed(Member mother, Member father)//Austin todo
         {
-            Member offspring = new Member(row, col);
+            Member offspring = new Member(row, col, rowWise);
             int i, j, rule_tmp, count, rngRow, rngCol;
             bool choose = false;
             if(rowWise)
@@ -226,11 +306,7 @@ namespace Nonogram_Infinity
                 {
                     rngRow = RandomHolder.Instance.Next(0, row);
                     rngCol = RandomHolder.Instance.Next(0, col);
-                } while (offspring.DNA[rngRow, rngCol]);
-                do
-                {
-                    rngCol = RandomHolder.Instance.Next(0, col);
-                } while (offspring.DNA[rngRow, rngCol]);
+                } while (offspring.DNA[rngRow, rngCol] || helper[rngRow, rngCol] == 2);
                 offspring.DNA[rngRow, rngCol] = true;
             }
 
@@ -239,7 +315,7 @@ namespace Nonogram_Infinity
         }
         public Member BreedReverse(Member mother, Member father)//Austin todo
         {
-            Member offspring = new Member(row, col);
+            Member offspring = new Member(row, col, rowWise);
             int i, j, rule_tmp, count, rngRow, rngCol;
             bool choose = false;
             if (rowWise)
@@ -395,11 +471,7 @@ namespace Nonogram_Infinity
                 {
                     rngRow = RandomHolder.Instance.Next(0, row);
                     rngCol = RandomHolder.Instance.Next(0, col);
-                } while (offspring.DNA[rngRow, rngCol]);
-                do
-                {
-                    rngCol = RandomHolder.Instance.Next(0, col);
-                } while (offspring.DNA[rngRow, rngCol]);
+                } while (offspring.DNA[rngRow, rngCol] || helper[rngRow, rngCol] == 2);
                 offspring.DNA[rngRow, rngCol] = true;
             }
             return offspring;
@@ -459,9 +531,11 @@ namespace Nonogram_Infinity
         public void ConsultExperts(Population population) //Kaden todo
         {
             int[,] agreement = new int[row,col];
-
+            int count = 0;
             foreach(Member member in members)
             {
+                if (count == members.Count*.25)
+                    break;
                 for(int i = 0; i < row; i++)
                 {
                     for(int j = 0; j < col; j++)
@@ -472,9 +546,13 @@ namespace Nonogram_Infinity
                         }
                     }
                 }
+                count++;
             }
+            count = 0;
             foreach (Member member in population.members)
             {
+                if (count == population.members.Count*.25)
+                    break;
                 for (int i = 0; i < row; i++)
                 {
                     for (int j = 0; j < col; j++)
@@ -485,6 +563,7 @@ namespace Nonogram_Infinity
                         }
                     }
                 }
+                count++;
             }
             List<Expert> experts = new List<Expert>();
             for (int i = 0; i < row; i++)
