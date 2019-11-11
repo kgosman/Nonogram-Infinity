@@ -627,14 +627,16 @@ namespace Nonogram_Infinity
             }
             
             experts = experts.OrderByDescending(expert => expert.weight).ToList();
-            int blackCount = 0, index = 0;
-            while(index < experts.Count)
+            int blackCount = 0;
+            foreach(Expert expert in experts)
             {
-                if (blackCount == black_squares)
+                if(blackCount == black_squares)
+                {
                     break;
-
+                }
+                solution.DNA[expert.i, expert.j] = true;
+                blackCount++;
             }
-            while(blackCount < black_squares)
             solution.FindFitness(rowConstraints,colConstraints);
         }
     }

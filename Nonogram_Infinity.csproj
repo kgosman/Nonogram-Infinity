@@ -67,6 +67,7 @@
     <Compile Include="Classes\Population.cs" />
     <Compile Include="Classes\RandomHoldercs.cs" />
     <Compile Include="Classes\ReadFile.cs" />
+    <Compile Include="Classes\WriteFile.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
