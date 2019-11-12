@@ -144,7 +144,7 @@ namespace Nonogram_Infinity
                 }
             }
             */
-            for (i = 0; i < 100; i++)
+            for (i = 0; i < 2*(row*col); i++)
             {
                 //members.Add(new Member(row, col, black_squares, rowConstraints, colConstraints, helper));
                 members.Add(new Member(row, col, rowConstraints, colConstraints, helper, type));
@@ -570,7 +570,7 @@ namespace Nonogram_Infinity
                 int rng = RandomHolder.Instance.Next(0, 10);
                 if(elitePreservation == true)
                 {
-                    if (j > members.Count / 50 && rng < 5)
+                    if (j > 10 && rng < 3)
                     {
                         members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
                         members[i].FindFitness(rowConstraints, colConstraints);
@@ -579,7 +579,7 @@ namespace Nonogram_Infinity
                 }
                 else
                 {
-                    if (rng < 5)
+                    if (rng < 3)
                     {
                         members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
                         members[i].FindFitness(rowConstraints, colConstraints);
@@ -608,7 +608,7 @@ namespace Nonogram_Infinity
             int count = 0;
             foreach (Member member in members)
             {
-                if (count == members.Count * .10)
+                if (count == members.Count * .25)
                     break;
                 for (int i = 0; i < row; i++)
                 {
@@ -625,7 +625,7 @@ namespace Nonogram_Infinity
             count = 0;
             foreach (Member member in population.members)
             {
-                if (count == population.members.Count*.10)
+                if (count == population.members.Count * .25)
                     break;
                 for (int i = 0; i < row; i++)
                 {
@@ -655,7 +655,7 @@ namespace Nonogram_Infinity
             int[] rowCount, colCount;
             rowCount = new int[row];
             colCount = new int[col];
-            for(int i = 0; i < row; i++)
+            for (int i = 0; i < row; i++)
             {
                 rowCount[i] = 0;
             }
@@ -667,14 +667,14 @@ namespace Nonogram_Infinity
             while (index < experts.Count)
             {
                 rule_break = false;
-                if(blackCount == black_squares)
+                if (blackCount == black_squares)
                 {
                     break;
                 }
 
                 if (rowCount[experts[index].i] == rowRuleCount[experts[index].i])
                     rule_break = true;
-                else if(colCount[experts[index].j] == colRuleCount[experts[index].j])
+                else if (colCount[experts[index].j] == colRuleCount[experts[index].j])
                     rule_break = true;
                 if (!rule_break)
                 {

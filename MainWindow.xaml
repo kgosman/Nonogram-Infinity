@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Nonogram_Infinity"
         mc:Ignorable="d"
-        Title="MainWindow" Height="925" Width="1400" Left="0" Top="0">
+        Title="Nonogram Infinity" Height="925" Width="1400" Left="0" Top="0">
     <Grid>
         <Canvas>
             <Rectangle Width="400" Height="400" Stroke="Black" 
