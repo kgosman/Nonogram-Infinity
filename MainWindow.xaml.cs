@@ -26,7 +26,7 @@ namespace Nonogram_Infinity
             InitializeComponent();
             DirectoryInfo di = new DirectoryInfo(Directory.GetCurrentDirectory());
             di = (di.Parent).Parent;
-            string picross = "Circle2";
+            string picross = "545";
             ReadFile grid = new ReadFile
             {
                 filepath = di.FullName + "\\Data\\" + picross + ".txt"
@@ -80,13 +80,13 @@ namespace Nonogram_Infinity
                 avg2 /= population2.members.Count;
                 avg2 = Math.Round(avg2, 2);
                 int correctRow = DrawRowBoard(grid, population2.members[0], xSpace, ySpace, avg2, population2.members[population2.members.Count - 1]);
-                if (population1.solution.Fitness < prevFitnessWoc || prevFitnessWoc == -1)
-                {
+                //if (population1.solution.Fitness < prevFitnessWoc || prevFitnessWoc == -1)
+                //{
                     xSpace = wocCanvas.Width / grid.numColumns;
                     ySpace = wocCanvas.Height / grid.numRows;
                     prevFitnessWoc = population1.solution.Fitness;
                     correctWoC = DrawWoC(grid, population1.solution, xSpace, ySpace);
-                }
+                //}
                 outfile.WriteToFile(genCount, population1, population2, avg1, avg2,correctCol,correctRow,correctWoC);
                 population1.BreedPopulaton(true);
                 population2.BreedPopulaton(true);

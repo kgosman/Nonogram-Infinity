@@ -570,7 +570,7 @@ namespace Nonogram_Infinity
                 int rng = RandomHolder.Instance.Next(0, 10);
                 if(elitePreservation == true)
                 {
-                    if (j > 10 && rng < 3)
+                    if (j > 10 && rng < 6)
                     {
                         members[i].MutateStartingPositions(rowWise, rowConstraints, colConstraints);
                         members[i].FindFitness(rowConstraints, colConstraints);
@@ -617,6 +617,10 @@ namespace Nonogram_Infinity
                         if (member.DNA[i, j] == true)
                         {
                             agreement[i, j] += 1;
+                            if (count == 0)
+                            {
+                                agreement[i, j] += 2;
+                            }
                         }
                     }
                 }
@@ -634,6 +638,10 @@ namespace Nonogram_Infinity
                         if (member.DNA[i, j] == true)
                         {
                             agreement[i, j] += 1;
+                            if (count == 0)
+                            {
+                                agreement[i, j] += 2;
+                            }
                         }
                     }
                 }

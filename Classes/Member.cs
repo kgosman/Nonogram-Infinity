@@ -431,7 +431,7 @@ namespace Nonogram_Infinity
                 for (i = 0; i < Row; i++)
                 {
                     int rowChance = RandomHolder.Instance.Next(0,10);
-                    if(rowChance >= 3 || RowRules[i].Contains(0))
+                    if(rowChance >= 1 || RowRules[i].Contains(0))
                     {
                         continue;
                     }
@@ -470,7 +470,7 @@ namespace Nonogram_Infinity
                 for (i = 0; i < Column; i++)
                 {
                     int colChance = RandomHolder.Instance.Next(0, 10);
-                    if (colChance >= 3 || ColumnRules[i].Contains(0))
+                    if (colChance >= 1 || ColumnRules[i].Contains(0))
                     {
                         continue;
                     }
